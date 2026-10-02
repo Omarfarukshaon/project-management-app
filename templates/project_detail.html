@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Project Tasks</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        
+        <div class="nav-bar">
+            <span><i class="fas fa-folder-open"></i> Project: <strong>{{ project['title'] }}</strong></span>
+            <a href="/" style="color: #4a90e2; font-weight: 600; text-decoration: none;">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+
+        <h2 style="margin-bottom: 20px;"><i class="fas fa-tasks"></i> Assigned Tasks</h2>
+        <hr style="border: 0; height: 1px; background: #eee; margin-bottom: 30px;">
+        
+        <ul>
+            {% for task in tasks %}
+                {% if task['is_completed'] == 1 %}
+                    {% set badge_class = 'badge-green' %}
+                    {% set status_text = 'Completed' %}
+                    {% set border_color = '#10b981' %}
+                {% elif today > task['deadline'] %}
+                    {% set badge_class = 'badge-red' %}
+                    {% set status_text = 'Overdue' %}
+                    {% set border_color = '#ef4444' %}
+                {% else %}
+                    <!-- UPDATED: Now uses vibrant blue for active tasks -->
+                    {% set badge_class = 'badge-blue' %}
+                    {% set status_text = 'In Progress' %}
+                    {% set border_color = '#3b82f6' %}
+                {% endif %}
+    
+                <li class="task-card" style="border-left: 5px solid {{ border_color }}; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <a href="/task/{{ task['id'] }}" class="task-title" style="display: inline-block; margin-top: 5px;">
+                            {{ task['title'] }}
+                        </a>
+                        <br>
+                        <small style="color: #64748b; font-weight: 500;">
+                            <i class="far fa-calendar-alt"></i> Task Deadline: {{ task['deadline'] }}
+                        </small>
+                    </div>
+                    <span class="badge {{ badge_class }}">{{ status_text }}</span>
+                </li>
+            {% else %}
+                <p style="color: #94a3b8; font-style: italic;">No tasks assigned to this project yet.</p>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Task Details</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <div class="nav-bar">
+            <span><i class="fas fa-tasks"></i> Task Details</span>
+            <a href="/" style="color: #4a90e2; font-weight: 600; text-decoration: none;">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+
+        <h1 style="margin-bottom: 5px;">{{ task['title'] }}</h1>
+        <p style="color: #64748b; font-weight: 500; margin-top: 0;">
+            <i class="far fa-calendar-alt"></i> Deadline: {{ task['deadline'] }}
+        </p>
+
+        <div style="margin: 20px 0;">
+            {% if task['is_completed'] %} 
+                <span class="badge badge-green" style="margin-left: 0;"><i class="fas fa-check-circle"></i> Completed</span> 
+            {% else %} 
+                <span class="badge badge-blue" style="margin-left: 0;"><i class="fas fa-spinner fa-spin"></i> In Progress</span>
+            {% endif %}
+        </div>
+
+        <!-- Button to mark task as complete (RESTRICTED TO DEVELOPERS) -->
+        {% if not task['is_completed'] and role == 'developer' %}
+        <form method="POST" style="margin-bottom: 30px;">
+            <input type="hidden" name="complete_task" value="1">
+            <button type="submit" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                <i class="fas fa-check"></i> Mark Task as Completed
+            </button>
+        </form>
+        {% endif %}
+
+        <!-- Reassign Developer Panel (RESTRICTED TO ADMINS/MANAGERS) -->
+        {% if role == 'admin' or role == 'manager' %}
+        <form method="POST" style="margin-bottom: 30px; display: flex; gap: 15px; align-items: center; background: #f0f9ff; padding: 15px 20px; border-radius: 8px; border: 1px solid #bae6fd; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+            <label style="font-weight: 600; color: #0369a1; margin: 0;"><i class="fas fa-user-edit" style="color: #0284c7; margin-right: 5px;"></i> Reassign Task to ID:</label>
+            <input type="number" name="reassign_developer_id" required placeholder="Current ID: {{ task['developer_id'] }}" style="width: 150px; margin: 0; padding: 8px; border: 1px solid #bae6fd;">
+            <button type="submit" style="margin: 0; padding: 8px 20px; background: #0284c7; box-shadow: 0 4px 6px rgba(2, 132, 199, 0.2);">Update</button>
+        </form>
+        {% endif %}
+        
+        <hr style="border: 0; height: 1px; background: #eee; margin: 30px 0;">
+
+        <!-- SUBTASKS SECTION -->
+        <h3><i class="fas fa-list-ul" style="color: #4a90e2;"></i> Subtasks</h3>
+        <ul>
+            {% for sub in subtasks %}
+                <!-- Dynamically changes border color if completed -->
+                <li class="task-card" style="padding: 12px 20px; border-left: 4px solid {% if sub['is_completed'] %}#10b981{% else %}#4a90e2{% endif %}; display: flex; justify-content: space-between; align-items: center;">
+                    
+                    <!-- Dynamically adds strike-through text if completed -->
+                    <div style="{% if sub['is_completed'] %}text-decoration: line-through; color: #94a3b8;{% endif %}">
+                        {% if sub['is_completed'] %}
+                            <i class="fas fa-check-circle" style="color: #10b981; margin-right: 10px;"></i>
+                        {% else %}
+                            <i class="fas fa-caret-right" style="color: #ccc; margin-right: 10px;"></i>
+                        {% endif %}
+                        {{ sub['title'] }}
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px;">
+                        <!-- NEW: Done Button (Visible to Developers ONLY if not already completed) -->
+                        {% if not sub['is_completed'] and role == 'developer' %}
+                        <form method="POST" style="margin: 0;">
+                            <input type="hidden" name="complete_subtask_id" value="{{ sub['id'] }}">
+                            <button type="submit" style="background: #10b981; padding: 6px 12px; font-size: 11px; box-shadow: none;">
+                                <i class="fas fa-check"></i> Done
+                            </button>
+                        </form>
+                        {% endif %}
+
+                        <!-- Delete Subtask Button (Visible to Admins/Managers) -->
+                        {% if role == 'admin' or role == 'manager' %}
+                        <form method="POST" style="margin: 0;">
+                            <input type="hidden" name="delete_subtask_id" value="{{ sub['id'] }}">
+                            <button type="submit" style="background: #ef4444; padding: 6px 12px; font-size: 11px; box-shadow: none;">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </form>
+                        {% endif %}
+                    </div>
+                </li>
+            {% else %}
+                <p style="color: #94a3b8; font-style: italic;">No subtasks yet.</p>
+            {% endfor %}
+        </ul>
+
+        <!-- Add subtask form visible to everyone to collaborate -->
+        <form method="POST" style="margin-top: 15px; display: flex; gap: 10px;">
+            <input type="text" name="subtask_title" required placeholder="Type new subtask..." style="margin: 0; flex-grow: 1;">
+            <button type="submit" style="white-space: nowrap;"><i class="fas fa-plus"></i> Add Subtask</button>
+        </form>
+
+        <hr style="border: 0; height: 1px; background: #eee; margin: 40px 0 30px 0;">
+        
+        <!-- COMMENTS SECTION -->
+        <h3><i class="fas fa-comments" style="color: #4a90e2;"></i> Comments & Updates</h3>
+        
+        <form method="POST">
+            <textarea name="comment_content" rows="3" required placeholder="Type an update here..."></textarea>
+            <button type="submit"><i class="fas fa-paper-plane"></i> Post Comment</button>
+        </form>
+
+        <ul style="margin-top: 30px;">
+            {% for comment in comments %}
+                <li style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 3px solid #cbd5e1;">
+                    <small style="color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">
+                        <i class="fas fa-user"></i> {{ comment['author'] }} &bull; <i class="far fa-clock"></i> {{ comment['timestamp'] }}
+                    </small>
+                    {{ comment['content'] }}
+                </li>
+            {% else %}
+                <p style="color: #94a3b8; font-style: italic;">No comments yet. Be the first to provide an update!</p>
+            {% endfor %}
+        </ul>
+    </div>
+</body>
+</html>

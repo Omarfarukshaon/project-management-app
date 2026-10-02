@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Profile</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <!-- Sidebar Menu -->
+    <div id="mySidebar" class="sidebar">
+        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+        <div class="sidebar-header">
+            <h3>Menu</h3>
+        </div>
+        <a href="/"><i class="fas fa-home" style="width: 20px;"></i> Dashboard</a>
+        <a href="/profile"><i class="fas fa-user-circle" style="width: 20px;"></i> My Profile</a>
+        <hr style="border: 0; height: 1px; background: #334155; margin: 20px 0;">
+        <a href="/logout" style="color: #ef4444;"><i class="fas fa-sign-out-alt" style="width: 20px;"></i> Log Out</a>
+    </div>
+
+    <div class="container">
+        
+        <div class="nav-bar">
+            <span style="display: flex; align-items: center;">
+                <i class="fas fa-bars hamburger-btn" onclick="openNav()"></i>
+                
+                {% if current_user['profile_image'] and current_user['profile_image'] != 'default.png' %}
+                    <img src="{{ url_for('static', filename='uploads/' + current_user['profile_image']) }}" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 2px solid #4a90e2; margin-right: 10px;">
+                {% else %}
+                    <i class="fas fa-user-circle" style="color: #4a90e2; font-size: 24px; margin-right: 10px;"></i>
+                {% endif %}
+                
+                <i class="fas fa-user-circle" style="color: #4a90e2; margin-right: 5px;"></i> My Profile
+            </span>
+            <a href="/" style="color: #4a90e2; font-weight: 600; text-decoration: none;">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+
+        <!-- Unified Profile Settings Form -->
+        <div style="background: #f8f9fa; padding: 30px; border-radius: 8px; border: 1px solid #e2e8f0; max-width: 500px; margin: 20px auto;">
+            <h3 style="margin-top: 0; color: #1e293b; text-align: center;"><i class="fas fa-user-cog"></i> Profile Settings</h3>
+            
+            <form method="POST" enctype="multipart/form-data">
+                <input type="hidden" name="update_profile" value="1">
+                
+                <div style="text-align: center; margin-bottom: 20px;">
+                    {% if user['profile_image'] and user['profile_image'] != 'default.png' %}
+                        <img src="{{ url_for('static', filename='uploads/' + user['profile_image']) }}" class="profile-img-preview">
+                    {% else %}
+                        <i class="fas fa-user-circle" style="font-size: 100px; color: #cbd5e1; margin-bottom: 15px;"></i>
+                    {% endif %}
+                    <br>
+                    <input type="file" name="profile_image" accept="image/*" style="font-size: 13px;">
+                </div>
+
+                <label style="font-weight: 600; color: #475569;">Full Name</label>
+                <input type="text" name="full_name" value="{{ user['full_name'] }}" placeholder="Enter your full name">
+
+                <label style="font-weight: 600; color: #475569;">New Password <small style="color: #94a3b8; font-weight: 400;">(Leave blank to keep current)</small></label>
+                <input type="password" name="new_password" placeholder="Enter new password">
+
+                <button type="submit" style="width: 100%; margin-top: 10px;"><i class="fas fa-save"></i> Save Changes</button>
+            </form>
+        </div>
+
+    </div>
+
+    <!-- JavaScript for Hamburger Menu -->
+    <script>
+        function openNav() { document.getElementById("mySidebar").style.width = "250px"; }
+        function closeNav() { document.getElementById("mySidebar").style.width = "0"; }
+    </script>
+</body>
+</html>
