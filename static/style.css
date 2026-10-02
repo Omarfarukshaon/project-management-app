@@ -18,8 +18,9 @@ h1, h2, h3 {
 
 /* --- Layout & Cards --- */
 .container {
-    max-width: 850px;
-    margin: 0 auto;
+    width: 95%;
+    max-width: 90%;
+    margin: 30px auto;
     background: #ffffff;
     padding: 40px;
     border-radius: 12px;
