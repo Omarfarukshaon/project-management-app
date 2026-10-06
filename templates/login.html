@@ -4,33 +4,34 @@
     <title>Login - Team Workspace</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <style>
-        body {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-        }
-        .login-container {
-            max-width: 400px;
-            width: 100%;
-            text-align: center;
-        }
-    </style>
 </head>
 <body>
-    <div class="container login-container">
-        <!-- Changed from "Project Manager" to "Team Workspace" -->
-        <h2><i class="fas fa-project-diagram" style="color: #4a90e2; font-size: 32px; margin-bottom: 10px;"></i><br>Project Management system</h2>
-        <p style="color: #64748b; margin-bottom: 25px;">Please log in to your account</p>
+    <div class="login-container">
         
-        <form method="POST">
-            <input type="text" name="username" placeholder="Username" required>
-            <input type="password" name="password" placeholder="Password" required>
-            <button type="submit" style="width: 100%; margin-top: 10px;">
-                <i class="fas fa-sign-in-alt"></i> Log In
-            </button>
-        </form>
+        <div class="login-card">
+            <h2>
+                <i class="fas fa-project-diagram"></i><br>
+                Project Management system
+            </h2>
+            <p>Please log in to your account</p>
+            
+            <!-- Beautiful Error Alert Box -->
+            {% if error %}
+            <div style="color: #e74c3c; background-color: #fdecea; border: 1px solid #fad2ce; padding: 15px; border-radius: 8px; margin-bottom: 25px; font-size: 16px; font-weight: 500;">
+                <i class="fas fa-exclamation-circle"></i> {{ error }}
+            </div>
+            {% endif %}
+            
+            <form method="POST">
+                <input type="text" name="username" placeholder="Username" required>
+                <input type="password" name="password" placeholder="Password" required>
+                
+                <button type="submit">
+                    <i class="fas fa-sign-in-alt"></i> Log In
+                </button>
+            </form>
+        </div>
+        
     </div>
 </body>
 </html>

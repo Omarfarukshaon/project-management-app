@@ -6,71 +6,45 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-
-    <!-- Sidebar Menu -->
-    <div id="mySidebar" class="sidebar">
-        <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-        <div class="sidebar-header">
-            <h3>Menu</h3>
-        </div>
-        <a href="/"><i class="fas fa-home" style="width: 20px;"></i> Dashboard</a>
-        <a href="/profile"><i class="fas fa-user-circle" style="width: 20px;"></i> My Profile</a>
-        <hr style="border: 0; height: 1px; background: #334155; margin: 20px 0;">
-        <a href="/logout" style="color: #ef4444;"><i class="fas fa-sign-out-alt" style="width: 20px;"></i> Log Out</a>
+    
+    <!-- Clean Top Navigation -->
+    <div class="nav-bar" style="width: 95%; max-width: 1400px; margin: 20px auto;">
+        <span><i class="fas fa-user-circle"></i> My Profile</span>
+        <a href="{{ url_for('dashboard') }}" class="logout-link" style="color: #4a90e2;">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
     </div>
 
-    <div class="container">
+    <!-- Centered Profile Settings Card -->
+    <div class="container" style="max-width: 650px; margin-top: 50px;">
+        <h2 style="text-align: center;"><i class="fas fa-user-cog"></i> Profile Settings</h2>
         
-        <div class="nav-bar">
-            <span style="display: flex; align-items: center;">
-                <i class="fas fa-bars hamburger-btn" onclick="openNav()"></i>
-                
-                {% if current_user['profile_image'] and current_user['profile_image'] != 'default.png' %}
-                    <img src="{{ url_for('static', filename='uploads/' + current_user['profile_image']) }}" style="width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 2px solid #4a90e2; margin-right: 10px;">
-                {% else %}
-                    <i class="fas fa-user-circle" style="color: #4a90e2; font-size: 24px; margin-right: 10px;"></i>
-                {% endif %}
-                
-                <i class="fas fa-user-circle" style="color: #4a90e2; margin-right: 5px;"></i> My Profile
-            </span>
-            <a href="/" style="color: #4a90e2; font-weight: 600; text-decoration: none;">
-                <i class="fas fa-arrow-left"></i> Back to Dashboard
-            </a>
-        </div>
+        <!-- Profile Image Preview Fix (Constrains image to a circle) -->
+        {% if user.profile_image %}
+            <img src="{{ url_for('static', filename='uploads/' + user.profile_image) }}" class="profile-img-preview" alt="Profile Picture">
+        {% else %}
+            <div style="text-align: center; margin-bottom: 30px;">
+                <i class="fas fa-user-circle" style="font-size: 120px; color: #cbd5e1;"></i>
+            </div>
+        {% endif %}
 
-        <!-- Unified Profile Settings Form -->
-        <div style="background: #f8f9fa; padding: 30px; border-radius: 8px; border: 1px solid #e2e8f0; max-width: 500px; margin: 20px auto;">
-            <h3 style="margin-top: 0; color: #1e293b; text-align: center;"><i class="fas fa-user-cog"></i> Profile Settings</h3>
+        <!-- multipart/form-data is required for image uploads! -->
+        <form method="POST" enctype="multipart/form-data">
             
-            <form method="POST" enctype="multipart/form-data">
-                <input type="hidden" name="update_profile" value="1">
-                
-                <div style="text-align: center; margin-bottom: 20px;">
-                    {% if user['profile_image'] and user['profile_image'] != 'default.png' %}
-                        <img src="{{ url_for('static', filename='uploads/' + user['profile_image']) }}" class="profile-img-preview">
-                    {% else %}
-                        <i class="fas fa-user-circle" style="font-size: 100px; color: #cbd5e1; margin-bottom: 15px;"></i>
-                    {% endif %}
-                    <br>
-                    <input type="file" name="profile_image" accept="image/*" style="font-size: 13px;">
-                </div>
-
-                <label style="font-weight: 600; color: #475569;">Full Name</label>
-                <input type="text" name="full_name" value="{{ user['full_name'] }}" placeholder="Enter your full name">
-
-                <label style="font-weight: 600; color: #475569;">New Password <small style="color: #94a3b8; font-weight: 400;">(Leave blank to keep current)</small></label>
-                <input type="password" name="new_password" placeholder="Enter new password">
-
-                <button type="submit" style="width: 100%; margin-top: 10px;"><i class="fas fa-save"></i> Save Changes</button>
-            </form>
-        </div>
-
+            <label style="font-weight: 600; color: #475569;">Profile Picture</label>
+            <input type="file" name="profile_image" accept="image/*" style="padding: 10px;">
+            
+            <label style="font-weight: 600; color: #475569;">Full Name</label>
+            <input type="text" name="full_name" value="{{ user.full_name or user.username }}" placeholder="Enter full name" required>
+            
+            <label style="font-weight: 600; color: #475569;">New Password (leave blank to keep current)</label>
+            <input type="password" name="new_password" placeholder="Enter new password">
+            
+            <button type="submit" name="update_profile" style="width: 100%; margin-top: 15px;">
+                <i class="fas fa-save"></i> Save Changes
+            </button>
+        </form>
     </div>
 
-    <!-- JavaScript for Hamburger Menu -->
-    <script>
-        function openNav() { document.getElementById("mySidebar").style.width = "250px"; }
-        function closeNav() { document.getElementById("mySidebar").style.width = "0"; }
-    </script>
 </body>
 </html>

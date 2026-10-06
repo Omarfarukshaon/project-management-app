@@ -9,22 +9,28 @@ body {
     line-height: 1.6;
     margin: 0;
     padding: 40px 20px;
+    font-size: 18px; 
 }
 
-h1, h2, h3 {
-    color: #1a252f;
-    font-weight: 700;
-}
+/* --- Max-Scaled Headers --- */
+h1 { font-size: 48px; }
+h2 { font-size: 42px; color: #1a252f; font-weight: 700; margin-bottom: 30px; }
+h3 { font-size: 32px; color: #1a252f; font-weight: 700; }
 
 /* --- Layout & Cards --- */
 .container {
     width: 95%;
-    max-width: 90%;
-    margin: 30px auto;
+    max-width: 1400px; 
+    margin: 20px auto;
     background: #ffffff;
-    padding: 40px;
-    border-radius: 12px;
+    padding: 60px; 
+    border-radius: 16px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+/* TaskFlow Blue Theme for Main Container Headings */
+.container h2, .container h2 i {
+    color: #4a90e2;
 }
 
 /* --- Top Navigation Bar --- */
@@ -33,19 +39,21 @@ h1, h2, h3 {
     justify-content: space-between; 
     align-items: center; 
     background-color: #f8f9fa; 
-    padding: 15px 20px; 
-    border-radius: 8px; 
-    margin-bottom: 30px;
-    border-left: 4px solid #4a90e2;
+    padding: 28px 40px; 
+    border-radius: 12px; 
+    margin-bottom: 50px;
+    border-left: 6px solid #4a90e2;
 }
 
 .nav-bar span {
-    font-size: 15px;
-    color: #555;
+    font-size: 26px; 
+    font-weight: 500;
+    color: #444;
 }
 
 .logout-link {
     color: #e74c3c; 
+    font-size: 24px; 
     font-weight: 600; 
     text-decoration: none;
     transition: color 0.3s;
@@ -56,14 +64,15 @@ h1, h2, h3 {
 }
 
 /* --- Forms & Inputs --- */
-input[type="text"], input[type="password"], input[type="date"], input[type="number"], textarea {
+input[type="text"], input[type="password"], input[type="date"], input[type="number"], input[type="file"], textarea {
     width: 100%;
-    padding: 12px;
-    margin: 8px 0 20px 0;
+    padding: 18px;
+    margin: 8px 0 24px 0;
     border: 1px solid #e1e5eb;
-    border-radius: 6px;
+    border-radius: 8px;
     box-sizing: border-box;
     font-family: inherit;
+    font-size: 20px; 
     transition: border-color 0.3s, box-shadow 0.3s;
 }
 
@@ -74,20 +83,20 @@ input:focus, textarea:focus {
 }
 
 /* --- Buttons --- */
-button {
+button, .btn {
     background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
     color: white;
     border: none;
-    padding: 12px 24px;
-    border-radius: 6px;
+    padding: 18px 36px; 
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 15px;
+    font-size: 20px; 
     font-weight: 600;
     box-shadow: 0 4px 6px rgba(74, 144, 226, 0.2);
     transition: transform 0.2s, box-shadow 0.2s;
 }
 
-button:hover {
+button:hover, .btn:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 12px rgba(74, 144, 226, 0.3);
 }
@@ -100,40 +109,50 @@ ul {
 
 li.task-card {
     background: #ffffff;
-    margin: 15px 0;
-    padding: 20px;
-    border-radius: 8px;
+    margin: 24px 0;
+    padding: 35px 40px; 
+    border-radius: 12px;
     border: 1px solid #edf2f7;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.03);
     transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 li.task-card:hover {
     transform: translateY(-3px);
-    box-shadow: 0 8px 15px rgba(0,0,0,0.05);
+    box-shadow: 0 8px 15px rgba(0,0,0,0.06);
 }
 
 a.task-title {
     color: #2c3e50;
-    font-size: 18px;
+    font-size: 34px; 
     font-weight: 700;
     text-decoration: none;
     transition: color 0.2s;
+    display: block;
+    margin-bottom: 12px;
 }
 
 a.task-title:hover {
     color: #4a90e2;
 }
 
+li.task-card small, .task-card p {
+    font-size: 20px; 
+    color: #64748b;
+}
+
 /* --- Status Badges --- */
 .badge {
-    padding: 6px 14px;
+    padding: 8px 18px;
     border-radius: 20px;
-    font-size: 11px;
+    font-size: 15px; 
     font-weight: 700;
     color: white;
     display: inline-block;
-    margin-left: 10px;
+    margin-left: 12px;
     text-transform: uppercase;
     letter-spacing: 0.8px;
 }
@@ -141,9 +160,9 @@ a.task-title:hover {
 .badge-green { background-color: #10b981; } 
 .badge-red { background-color: #ef4444; }   
 .badge-black { background-color: #475569; } 
-.badge-blue { background-color: #3b82f6; } /* NEW: Standard attractive active blue */
+.badge-blue { background-color: #3b82f6; } 
 
-/* --- Hamburger Menu & Sidebar Styles --- */
+/* --- Sidebar Base Styles --- */
 .sidebar {
     height: 100%; width: 0; position: fixed; z-index: 1000;
     top: 0; left: 0; background-color: #1e293b; overflow-x: hidden;
@@ -151,45 +170,170 @@ a.task-title:hover {
 }
 
 .sidebar a {
-    padding: 12px 25px; text-decoration: none; font-size: 16px;
+    padding: 12px 35px; text-decoration: none; font-size: 20px; 
     color: #94a3b8; display: block; transition: 0.2s; font-weight: 600;
 }
 
 .sidebar a:hover { color: #ffffff; background: #334155; }
-.sidebar .closebtn { position: absolute; top: 0; right: 20px; font-size: 32px; margin-left: 50px; background: none; }
-.sidebar-header { padding: 0 25px 20px 25px; color: white; border-bottom: 1px solid #334155; margin-bottom: 20px; }
+.sidebar a i { margin-right: 12px; width: 25px; text-align: center; }
+.sidebar .closebtn { position: absolute; top: 0; right: 20px; font-size: 40px; margin-left: 50px; background: none; }
 
 .hamburger-btn {
-    cursor: pointer; font-size: 24px; color: #4a90e2; 
-    margin-right: 15px; transition: transform 0.2s;
+    cursor: pointer; font-size: 34px; color: #4a90e2; 
+    margin-right: 25px; transition: transform 0.2s;
 }
 .hamburger-btn:hover { transform: scale(1.1); color: #2563eb; }
 
+/* --- Jira-Style Sidebar Enhancements --- */
+.sidebar-profile {
+    padding: 20px 35px;
+    border-bottom: 1px solid #334155;
+    margin-bottom: 20px;
+}
+
+.sidebar-profile h3 { color: #ffffff; font-size: 26px; margin-bottom: 5px; }
+.sidebar-profile p { color: #94a3b8; font-size: 18px; margin: 0; }
+
+.sidebar-section-title {
+    color: #64748b;
+    font-size: 15px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    padding: 10px 35px;
+    margin-top: 25px;
+    margin-bottom: 5px;
+    font-weight: 700;
+}
+
 /* --- GitHub Style Daily Progress Graph --- */
 .graph-panel {
-    background: #fff; border-radius: 8px; padding: 20px;
-    border: 1px solid #e1e5eb; margin-top: 30px;
+    background: #fff; border-radius: 12px; padding: 40px;
+    border: 1px solid #e1e5eb; margin-top: 50px;
 }
 .contribution-graph {
     display: grid;
-    grid-template-rows: repeat(7, 14px); /* 7 days a week */
-    grid-auto-flow: column; /* Flow left to right like GitHub */
-    gap: 4px;
+    grid-template-rows: repeat(7, 22px); 
+    grid-auto-flow: column; 
+    gap: 8px; 
     overflow-x: auto;
-    padding-bottom: 10px;
+    padding-bottom: 15px;
 }
 .graph-day {
-    width: 14px; height: 14px; border-radius: 3px;
-    background-color: #ebedf0; /* Empty square */
+    width: 22px; height: 22px; border-radius: 4px; 
+    background-color: #ebedf0; 
 }
-/* The GitHub Green Colors */
+
 .graph-day[data-level="1"] { background-color: #9be9a8; }
 .graph-day[data-level="2"] { background-color: #40c463; }
 .graph-day[data-level="3"] { background-color: #30a14e; }
 .graph-day[data-level="4"] { background-color: #216e39; }
-.graph-day:hover { outline: 1px solid rgba(27,31,35,0.2); outline-offset: -1px; }
+.graph-day:hover { outline: 2px solid rgba(27,31,35,0.2); outline-offset: -2px; }
 
+/* --- Login Interface --- */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 80px); 
+    width: 100%;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 580px; 
+    padding: 70px 60px; 
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1); 
+}
+
+.login-card h2 { text-align: center; font-size: 38px; margin-bottom: 15px; }
+.login-card h2 i { font-size: 56px; color: #4a90e2; margin-bottom: 25px; }
+.login-card p { text-align: center; font-size: 22px; color: #64748b; margin-bottom: 45px; }
+
+/* --- Profile Image Constraint Fix --- */
 .profile-img-preview {
-    width: 100px; height: 100px; border-radius: 50%;
-    object-fit: cover; border: 3px solid #4a90e2; margin-bottom: 15px;
+    width: 150px; 
+    height: 150px; 
+    border-radius: 50%;
+    object-fit: cover; 
+    border: 4px solid #4a90e2; 
+    margin: 0 auto 25px auto;
+    display: block;
+}
+
+/* --- Dashboard Quick Stats & Project Grid --- */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    margin-bottom: 50px;
+}
+
+.stat-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 30px;
+    display: flex;
+    align-items: center;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.06);
+}
+
+.stat-card i {
+    font-size: 45px;
+    margin-right: 25px;
+}
+
+.stat-info h4 {
+    margin: 0;
+    font-size: 32px;
+    color: #1e293b;
+    font-weight: 700;
+}
+
+.stat-info p {
+    margin: 0;
+    font-size: 18px;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.quick-projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    margin-bottom: 50px;
+}
+
+a.quick-project-card {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    padding: 20px 25px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #334155;
+    font-size: 20px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    transition: all 0.2s;
+}
+
+a.quick-project-card i {
+    color: #4a90e2;
+    margin-right: 15px;
+    font-size: 24px;
+}
+
+a.quick-project-card:hover {
+    background: #f0f7ff;
+    border-color: #4a90e2;
+    transform: translateY(-2px);
+    color: #4a90e2;
 }
