@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Global User Activities</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        
+        <div class="nav-bar">
+            <span><i class="fas fa-chart-line"></i> Global User Activities</span>
+            <a href="/" style="color: #4a90e2; font-weight: 600; text-decoration: none;">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+
+        <h3 style="margin-bottom: 20px;"><i class="fas fa-users" style="color: #4a90e2;"></i> Team Contribution Overview</h3>
+        <p style="color: #64748b; margin-bottom: 25px;">Click on any user row below to inspect their detailed daily contribution history.</p>
+
+        <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
+            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead>
+                    <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0; color: #475569; font-size: 15px;">
+                        <th style="padding: 15px 20px;">Username</th>
+                        <th style="padding: 15px 20px;">Full Name</th>
+                        <th style="padding: 15px 20px;">Role</th>
+                        <th style="padding: 15px 20px;">Total Score (Interactions)</th>
+                        <th style="padding: 15px 20px; text-align: right;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ua in users_activity %}
+                    <tr style="border-bottom: 1px solid #f1f5f9; transition: background 0.2s;" onmouseover="this.style.background='#f8fafc'" onmouseout="this.style.background='transparent'">
+                        <td style="padding: 15px 20px; font-weight: 600; color: #1e293b;">{{ ua.username }}</td>
+                        <td style="padding: 15px 20px; color: #475569;">{{ ua.full_name or 'N/A' }}</td>
+                        <td style="padding: 15px 20px;">
+                            <span class="badge {% if ua.role == 'admin' %}badge-red{% elif ua.role == 'manager' %}badge-blue{% else %}badge-green{% endif %}" style="font-size: 11px; padding: 4px 8px; margin: 0;">
+                                {{ ua.role | upper }}
+                            </span>
+                        </td>
+                        <td style="padding: 15px 20px; font-weight: 700; color: #10b981;">{{ ua.total_activity or 0 }}</td>
+                        <td style="padding: 15px 20px; text-align: right;">
+                            <a href="{{ url_for('user_activity_detail', user_id=ua.id) }}" class="btn" style="padding: 6px 14px; font-size: 13px; text-decoration: none; box-shadow: none;">
+                                <i class="fas fa-eye"></i> View Details
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</body>
+</html>

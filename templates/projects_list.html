@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Complete Project List</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        
+        <div class="nav-bar">
+            <span><i class="fas fa-list"></i> Complete Project List</span>
+            <a href="/" style="color: #4a90e2; font-weight: 600; text-decoration: none;">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+
+        <!-- SEARCH BAR WITH ENHANCED FONT VISIBILITY -->
+        <form method="GET" action="{{ url_for('project_list') }}" style="display: flex; gap: 10px; margin-bottom: 30px;">
+            <input type="text" name="q" value="{{ search_query }}" placeholder="Search projects by title..." style="margin: 0; flex-grow: 1; padding: 14px 16px; font-size: 18px; font-family: inherit; color: #1e293b; font-weight: 500; background-color: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px;">
+            <button type="submit" style="margin: 0; padding: 14px 24px; font-size: 16px;"><i class="fas fa-search"></i> Search</button>
+            {% if search_query %}
+            <a href="{{ url_for('project_list') }}" class="btn" style="background: #64748b; text-decoration: none; padding: 14px 20px; font-size: 16px; display: flex; align-items: center;">Clear</a>
+            {% endif %}
+        </form>
+
+        <h3 style="margin-bottom: 20px;"><i class="fas fa-folder-open" style="color: #4a90e2;"></i> All Workspaces ({{ projects|length }})</h3>
+
+        {% if projects %}
+        <div class="quick-projects-grid">
+            {% for project in projects %}
+            <a href="{{ url_for('project_detail', project_id=project.id) }}" class="quick-project-card">
+                <i class="fas fa-folder"></i>
+                <span>{{ project.title }}</span>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+            <p style="color: #94a3b8; font-style: italic; padding: 20px 0;">No projects found matching your search.</p>
+        {% endif %}
+
+    </div>
+</body>
+</html>

@@ -7,32 +7,36 @@
 </head>
 <body>
 
-    <!-- The Jira-Style Sidebar -->
+    <!-- Jira-Style Sidebar -->
     <div id="mySidebar" class="sidebar">
         <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
         
-        <div class="sidebar-profile">
-            <h3><i class="fas fa-user-circle"></i> {{ user.full_name or user.username }}</h3>
-            <p>Role: {{ role | capitalize }}</p>
+        <!-- Profile Picture & Details in Sidebar -->
+        <div class="sidebar-profile" style="text-align: center; padding: 25px 20px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+            <img src="{{ url_for('static', filename='uploads/' + user.profile_image) }}" style="width: 75px; height: 75px; border-radius: 50%; object-fit: cover; border: 2px solid #fff; box-shadow: 0 2px 6px rgba(0,0,0,0.2); margin-bottom: 10px;" alt="Profile Picture" onerror="this.src='{{ url_for('static', filename='uploads/default.png') }}';">
+            <h3 style="margin: 0; color: #fff; font-size: 18px;">{{ user.full_name or user.username }}</h3>
+            <p style="margin: 5px 0 0 0; color: #94a3b8; font-size: 13px;">Role: {{ role | capitalize }}</p>
         </div>
 
-        <div class="sidebar-section-title">Account Settings</div>
-        <a href="{{ url_for('profile') }}"><i class="fas fa-id-card"></i> User Information</a>
-        <a href="{{ url_for('profile') }}"><i class="fas fa-shield-alt"></i> Password & Security</a>
-
-        <div class="sidebar-section-title">Workspaces</div>
+        <div class="sidebar-section-title">Main Menu</div>
+        <a href="{{ url_for('project_list') }}"><i class="fas fa-list"></i> Project List</a>
         
-        {% if role in ['admin', 'manager'] %}
-        <a href="{{ url_for('add_project') }}" style="color: #4a90e2;">
-            <i class="fas fa-plus"></i> Create New Project
-        </a>
+        <!-- Reports & Analytics Button -->
+        <div class="sidebar-section-title">Reports & Analytics</div>
+        <a href="{{ url_for('generate_report') }}" style="color: #10b981;"><i class="fas fa-file-excel"></i> Generate Report</a>
+        
+        {% if role == 'admin' %}
+            <div class="sidebar-section-title">Administration</div>
+            <a href="{{ url_for('add_project') }}" style="color: #4a90e2;"><i class="fas fa-plus"></i> Create Project</a>
+            <a href="{{ url_for('manage_users') }}"><i class="fas fa-users-cog"></i> Manage Users</a>
+            <a href="{{ url_for('admin_activities') }}"><i class="fas fa-chart-line"></i> User Activities</a>
+            
+            <div class="sidebar-section-title">Account</div>
+            <a href="{{ url_for('profile') }}"><i class="fas fa-user-shield"></i> Account Settings</a>
+        {% else %}
+            <div class="sidebar-section-title">Personal</div>
+            <a href="{{ url_for('profile') }}"><i class="fas fa-user-shield"></i> Account Settings</a>
         {% endif %}
-        
-        {% for project in projects %}
-        <a href="{{ url_for('project_detail', project_id=project.id) }}">
-            <i class="fas fa-folder"></i> {{ project.title }}
-        </a>
-        {% endfor %}
     </div>
 
     <!-- Main Homepage Content -->
@@ -49,9 +53,8 @@
 
         <div class="container">
             <h2><i class="fas fa-home"></i> {{ dashboard_title }}</h2>
-            <p style="font-size: 22px; color: #64748b; margin-bottom: 40px;">Overview of your current workspace and activity.</p>
             
-            <!-- NEW: Quick Stats Row -->
+            <!-- Quick Stats Row -->
             <div class="stats-grid">
                 <div class="stat-card">
                     <i class="fas fa-layer-group" style="color: #4a90e2;"></i>
@@ -76,9 +79,19 @@
                 </div>
             </div>
 
-            <!-- NEW: Quick Access Project Grid -->
+            <!-- Quick Access Section Header with Inline "Create Project" Button for Admin -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="margin: 0;"><i class="fas fa-star" style="color: #f59e0b;"></i> Quick Access (Recent)</h3>
+                
+                {% if role == 'admin' %}
+                <a href="{{ url_for('add_project') }}" class="btn" style="text-decoration: none; font-size: 16px; padding: 10px 20px; box-shadow: none;">
+                    <i class="fas fa-plus"></i> Create New Project
+                </a>
+                {% endif %}
+            </div>
+
+            <!-- Quick Access Project Grid (7 Projects) -->
             {% if projects %}
-            <h3 style="margin-bottom: 20px;"><i class="fas fa-star" style="color: #f59e0b;"></i> Quick Access</h3>
             <div class="quick-projects-grid">
                 {% for project in projects %}
                 <a href="{{ url_for('project_detail', project_id=project.id) }}" class="quick-project-card">
@@ -86,11 +99,17 @@
                     <span>{{ project.title }}</span>
                 </a>
                 {% endfor %}
+                
+                <!-- "More" Card inside the grid -->
+                <a href="{{ url_for('project_list') }}" class="quick-project-card" style="background: #f0f7ff; border-color: #4a90e2; color: #4a90e2; justify-content: center;">
+                    <i class="fas fa-ellipsis-h" style="font-size: 24px; margin-right: 12px; color: #4a90e2;"></i>
+                    <span style="font-weight: 700;">More Projects...</span>
+                </a>
             </div>
             {% endif %}
             
             <!-- Heatmap Panel -->
-            <div class="graph-panel" style="margin-top: 0;">
+            <div class="graph-panel" style="margin-top: 50px;">
                 <h3><i class="fas fa-chart-line"></i> Daily Progress & Contributions</h3>
                 <div class="contribution-graph">
                     {% for day in days %}

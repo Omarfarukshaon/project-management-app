@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Task</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .dev-select-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 10px 0 25px 0;
+        }
+        .dev-select-card {
+            display: flex;
+            align-items: center;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 15px 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .dev-select-card:hover {
+            border-color: #4a90e2;
+            background: #f0f7ff;
+        }
+        .dev-select-card input[type="checkbox"] {
+            width: 22px;
+            height: 22px;
+            margin-right: 15px;
+            cursor: pointer;
+            accent-color: #4a90e2;
+        }
+        .dev-select-card img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 15px;
+            border: 2px solid #fff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .dev-info-name {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 18px;
+            margin-bottom: 2px;
+        }
+        .dev-info-meta {
+            font-size: 14px;
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" style="max-width: 750px;">
+        <div class="nav-bar">
+            <span><i class="fas fa-tasks"></i> Add Task to {{ project.title }}</span>
+            <a href="{{ url_for('project_detail', project_id=project.id) }}" style="color: #4a90e2; font-weight: 600; text-decoration: none;">
+                <i class="fas fa-times"></i> Cancel
+            </a>
+        </div>
+
+        <form method="POST">
+            <label style="font-weight: 600; color: #475569; font-size: 18px;">Task Title:</label>
+            <input type="text" name="task_title" required placeholder="E.g., Build Database Schema">
+
+            <!-- Priority Selection Dropdown -->
+            <label style="font-weight: 600; color: #475569; font-size: 18px; display: block; margin-top: 20px;">Task Priority:</label>
+            <select name="priority" required style="width: 100%; padding: 18px; margin: 8px 0 24px 0; border: 1px solid #e1e5eb; border-radius: 8px; font-size: 18px; background: #fff;">
+                <option value="Low">🟢 Low Priority</option>
+                <option value="Medium" selected>🟡 Medium Priority</option>
+                <option value="High">🟠 High Priority</option>
+                <option value="Urgent">🔴 Urgent / Critical</option>
+            </select>
+
+            <label style="font-weight: 600; color: #475569; font-size: 18px; display: block; margin-top: 10px;">Assign Developers:</label>
+            <p style="color: #64748b; font-size: 14px; margin-top: 0; margin-bottom: 10px;">Select one or more developers for this task:</p>
+            
+            <div class="dev-select-list">
+                {% for dev in developers %}
+                <label class="dev-select-card">
+                    <input type="checkbox" name="developer_ids" value="{{ dev.id }}">
+                    <img src="{{ url_for('static', filename='uploads/' + dev.profile_image) }}" alt="Avatar" onerror="this.src='{{ url_for('static', filename='uploads/default.png') }}';">
+                    <div style="flex-grow: 1;">
+                        <div class="dev-info-name">{{ dev.full_name or dev.username }}</div>
+                        <div class="dev-info-meta">
+                            <span class="badge badge-green" style="font-size: 10px; padding: 2px 6px; margin: 0; margin-right: 5px;">Developer</span>
+                            ID: {{ dev.id }} &bull; Username: {{ dev.username }}
+                        </div>
+                    </div>
+                </label>
+                {% else %}
+                <p style="color: #94a3b8; font-style: italic;">No developers available in the system.</p>
+                {% endfor %}
+            </div>
+
+            <label style="font-weight: 600; color: #475569; font-size: 18px;">Task Deadline:</label>
+            <input type="date" name="task_deadline" required>
+
+            <button type="submit" style="width: 100%; margin-top: 20px;">
+                <i class="fas fa-plus-circle"></i> Assign Task
+            </button>
+        </form>
+    </div>
+</body>
+</html>

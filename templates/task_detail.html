@@ -4,122 +4,359 @@
     <title>Task Details</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 32px;
+            width: 32px;
+            border-radius: 50%;
+            background: #4a90e2;
+            cursor: pointer;
+            margin-top: -11px;
+            box-shadow: 0 3px 10px rgba(74, 144, 226, 0.4);
+            border: 4px solid #ffffff;
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 12px;
+            cursor: pointer;
+            background: #e2e8f0;
+            border-radius: 6px;
+        }
+        textarea {
+            width: 100%;
+            padding: 16px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 16px;
+            color: #1e293b;
+            background-color: #ffffff;
+            box-sizing: border-box;
+            line-height: 1.5;
+            resize: vertical;
+        }
+        textarea:focus {
+            border-color: #4a90e2;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.15);
+        }
+
+        /* Scaled-up Facebook Style Comments CSS */
+        .fb-comment-container {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .fb-comment-wrapper {
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+        }
+        .fb-comment-bubble {
+            background-color: #f0f2f5;
+            padding: 14px 22px;
+            border-radius: 20px;
+            display: inline-block;
+            max-width: 100%;
+        }
+        .fb-comment-author {
+            font-weight: 600;
+            color: #050505;
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+        .fb-comment-text {
+            color: #050505;
+            font-size: 20px;
+            white-space: pre-line;
+            word-wrap: break-word;
+            line-height: 1.5;
+        }
+        .fb-comment-time {
+            color: #65676b;
+            font-size: 15px;
+            margin-left: 16px;
+            margin-top: 6px;
+        }
+        .fb-comment-input {
+            background-color: #f0f2f5;
+            border-radius: 25px;
+            border: none;
+            padding: 16px 24px;
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 20px;
+            resize: none;
+        }
+        .fb-comment-input:focus {
+            box-shadow: none;
+            outline: none;
+            background-color: #e4e6e9;
+        }
+        .fb-view-more {
+            color: #1877f2;
+            font-weight: 600;
+            font-size: 18px;
+            text-decoration: none;
+            padding: 5px 0;
+            font-family: system-ui, -apple-system, sans-serif;
+            display: inline-block;
+            cursor: pointer;
+        }
+        .fb-view-more:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
-        <div class="nav-bar">
-            <span><i class="fas fa-tasks"></i> Task Details</span>
-            <a href="/" style="color: #4a90e2; font-weight: 600; text-decoration: none;">
-                <i class="fas fa-arrow-left"></i> Back to Dashboard
+    <div class="container" style="max-width: 1300px; width: 95%;">
+        
+        <div class="nav-bar" style="padding: 20px 30px; font-size: 20px;">
+            <span style="font-weight: 700;"><i class="fas fa-tasks" style="color: #4a90e2; margin-right: 8px;"></i> Task Details</span>
+            <a href="{{ url_for('project_detail', project_id=task.project_id) }}" style="color: #4a90e2; font-weight: 600; text-decoration: none; font-size: 18px;">
+                <i class="fas fa-arrow-left"></i> Back to Project
             </a>
         </div>
 
-        <h1 style="margin-bottom: 5px;">{{ task['title'] }}</h1>
-        <p style="color: #64748b; font-weight: 500; margin-top: 0;">
-            <i class="far fa-calendar-alt"></i> Deadline: {{ task['deadline'] }}
-        </p>
-
-        <div style="margin: 20px 0;">
-            {% if task['is_completed'] %} 
-                <span class="badge badge-green" style="margin-left: 0;"><i class="fas fa-check-circle"></i> Completed</span> 
-            {% else %} 
-                <span class="badge badge-blue" style="margin-left: 0;"><i class="fas fa-spinner fa-spin"></i> In Progress</span>
-            {% endif %}
+        <div style="margin-bottom: 35px;">
+            <h1 style="margin: 0; color: #1e293b; font-size: 38px;">{{ task.title }}</h1>
         </div>
 
-        <!-- Button to mark task as complete (RESTRICTED TO DEVELOPERS) -->
-        {% if not task['is_completed'] and role == 'developer' %}
-        <form method="POST" style="margin-bottom: 30px;">
-            <input type="hidden" name="complete_task" value="1">
-            <button type="submit" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
-                <i class="fas fa-check"></i> Mark Task as Completed
-            </button>
-        </form>
-        {% endif %}
+        <!-- ROLE-BASED LAYOUT ADJUSTMENT -->
+        {% if role == 'developer' %}
+            <!-- Developer View: Progress Slider on Left, Info & Assignees on Right -->
+            <div style="display: grid; grid-template-columns: 2.2fr 1fr; gap: 40px; margin-top: 20px;">
+                
+                <!-- Left Column: Progress Slider -->
+                <div>
+                    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 35px; box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
+                        <h3 style="margin-top: 0; margin-bottom: 15px; color: #334155; font-size: 22px;">
+                            <i class="fas fa-chart-pie" style="color: #4a90e2;"></i> Update My Task Progress & Work Log
+                        </h3>
+                        <p style="color: #64748b; font-size: 16px; margin-bottom: 30px; line-height: 1.5;">Drag the slider to set your individual percentage and log what work you have completed.</p>
 
-        <!-- Reassign Developer Panel (RESTRICTED TO ADMINS/MANAGERS) -->
-        {% if role == 'admin' or role == 'manager' %}
-        <form method="POST" style="margin-bottom: 30px; display: flex; gap: 15px; align-items: center; background: #f0f9ff; padding: 15px 20px; border-radius: 8px; border: 1px solid #bae6fd; box-shadow: 0 2px 4px rgba(0,0,0,0.02);">
-            <label style="font-weight: 600; color: #0369a1; margin: 0;"><i class="fas fa-user-edit" style="color: #0284c7; margin-right: 5px;"></i> Reassign Task to ID:</label>
-            <input type="number" name="reassign_developer_id" required placeholder="Current ID: {{ task['developer_id'] }}" style="width: 150px; margin: 0; padding: 8px; border: 1px solid #bae6fd;">
-            <button type="submit" style="margin: 0; padding: 8px 20px; background: #0284c7; box-shadow: 0 4px 6px rgba(2, 132, 199, 0.2);">Update</button>
-        </form>
-        {% endif %}
-        
-        <hr style="border: 0; height: 1px; background: #eee; margin: 30px 0;">
+                        <form method="POST" style="display: flex; flex-direction: column;">
+                            
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+                                <span style="font-weight: 600; color: #94a3b8; font-size: 16px;">0% (Not Started)</span>
+                                <span style="font-weight: 800; color: #1e293b; font-size: 38px;" id="progressText">{{ my_progress }}%</span>
+                                <span style="font-weight: 600; color: #10b981; font-size: 16px;">100% (Completed)</span>
+                            </div>
+                            
+                            <input type="range" name="progress_value" min="0" max="100" value="{{ my_progress }}" 
+                                   oninput="document.getElementById('progressText').innerText = this.value + '%'">
+                            
+                            <div style="margin-top: 30px;">
+                                <label style="display: block; font-weight: 600; color: #334155; font-size: 18px; margin-bottom: 10px;">What work did you complete? <span style="color: #ef4444;">*</span></label>
+                                <textarea name="progress_note" rows="4" required placeholder="E.g., Finished writing schema and tested queries..."></textarea>
+                            </div>
 
-        <!-- SUBTASKS SECTION -->
-        <h3><i class="fas fa-list-ul" style="color: #4a90e2;"></i> Subtasks</h3>
-        <ul>
-            {% for sub in subtasks %}
-                <!-- Dynamically changes border color if completed -->
-                <li class="task-card" style="padding: 12px 20px; border-left: 4px solid {% if sub['is_completed'] %}#10b981{% else %}#4a90e2{% endif %}; display: flex; justify-content: space-between; align-items: center;">
+                            <div style="display: flex; justify-content: flex-end; margin-top: 25px;">
+                                <button type="submit" name="update_progress" style="padding: 14px 28px; font-size: 18px; margin: 0; box-shadow: 0 4px 6px rgba(74, 144, 226, 0.2);">
+                                    <i class="fas fa-save"></i> Save My Progress & Log Work
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Right Column: Task Info & Assignees -->
+                <div>
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 30px; margin-bottom: 30px;">
+                        <h3 style="margin-top: 0; color: #334155; font-size: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px;">Task Info</h3>
+                        
+                        <div style="margin-top: 20px;">
+                            <p style="margin: 0 0 10px 0; color: #64748b; font-size: 15px; font-weight: 600;">OVERALL STATUS</p>
+                            {% if task.is_completed %}
+                                <span class="badge badge-green" style="font-size: 16px; padding: 8px 16px; margin: 0; display: inline-block;"><i class="fas fa-check-circle"></i> Completed (100%)</span>
+                            {% elif task.deadline < today %}
+                                <span class="badge badge-red" style="font-size: 16px; padding: 8px 16px; margin: 0; display: inline-block;"><i class="fas fa-exclamation-triangle"></i> Overdue ({{ task.progress }}%)</span>
+                            {% else %}
+                                <span class="badge badge-blue" style="font-size: 16px; padding: 8px 16px; margin: 0; display: inline-block;"><i class="fas fa-spinner fa-spin"></i> In Progress ({{ task.progress }}%)</span>
+                            {% endif %}
+                        </div>
+
+                        <div style="margin-top: 25px;">
+                            <p style="margin: 0 0 8px 0; color: #64748b; font-size: 15px; font-weight: 600;">PRIORITY LEVEL</p>
+                            <span class="badge {% if task.priority == 'Urgent' or task.priority == 'High' %}badge-red{% elif task.priority == 'Medium' %}badge-blue{% else %}badge-green{% endif %}" style="font-size: 15px; padding: 6px 14px; margin: 0;">
+                                {{ task.priority or 'Medium' }}
+                            </span>
+                        </div>
+
+                        <div style="margin-top: 25px;">
+                            <p style="margin: 0 0 8px 0; color: #64748b; font-size: 15px; font-weight: 600;">DEADLINE</p>
+                            <p style="margin: 0; color: #1e293b; font-size: 18px; font-weight: 600;">
+                                <i class="far fa-calendar-alt" style="color: #4a90e2; margin-right: 5px;"></i> {{ task.deadline }}
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Assignees with Individual Progress Tracking -->
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 30px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px;">
+                            <h3 style="margin: 0; color: #334155; font-size: 20px;"><i class="fas fa-users" style="color: #4a90e2;"></i> Assignees</h3>
+                            <span class="badge badge-blue" style="margin: 0; font-size: 14px; padding: 4px 10px;">{{ assigned_devs|length }}</span>
+                        </div>
+                        
+                        <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;">
+                            {% for dev in assigned_devs %}
+                            <div style="background: #ffffff; border: 1px solid #cbd5e1; padding: 15px; border-radius: 8px;">
+                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                                    <div style="display: flex; align-items: center; gap: 10px;">
+                                        <img src="{{ url_for('static', filename='uploads/' + dev.profile_image) }}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;" onerror="this.src='{{ url_for('static', filename='uploads/default.png') }}';">
+                                        <span style="font-weight: 600; color: #1e293b; font-size: 15px;">{{ dev.full_name or dev.username }}</span>
+                                    </div>
+                                    <span style="font-weight: 700; color: #4a90e2; font-size: 15px;">{{ dev.progress }}%</span>
+                                </div>
+                                <div style="height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden;">
+                                    <div style="height: 100%; width: {{ dev.progress }}%; background: {% if dev.progress == 100 %}#10b981{% else %}#4a90e2{% endif %}; border-radius: 3px;"></div>
+                                </div>
+                            </div>
+                            {% else %}
+                            <p style="color: #94a3b8; font-style: italic; margin: 0; font-size: 15px;">No developers assigned to this task yet.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        {% else %}
+            <!-- Admin / Manager View: Balanced 2-Column Row for Task Info & Assignees -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px;">
+                
+                <!-- Task Info Card -->
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 30px;">
+                    <h3 style="margin-top: 0; color: #334155; font-size: 22px; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px;"><i class="fas fa-info-circle" style="color: #4a90e2;"></i> Task Info</h3>
                     
-                    <!-- Dynamically adds strike-through text if completed -->
-                    <div style="{% if sub['is_completed'] %}text-decoration: line-through; color: #94a3b8;{% endif %}">
-                        {% if sub['is_completed'] %}
-                            <i class="fas fa-check-circle" style="color: #10b981; margin-right: 10px;"></i>
+                    <div style="margin-top: 20px;">
+                        <p style="margin: 0 0 10px 0; color: #64748b; font-size: 15px; font-weight: 600;">OVERALL STATUS</p>
+                        {% if task.is_completed %}
+                            <span class="badge badge-green" style="font-size: 16px; padding: 8px 16px; margin: 0; display: inline-block;"><i class="fas fa-check-circle"></i> Completed (100%)</span>
+                        {% elif task.deadline < today %}
+                            <span class="badge badge-red" style="font-size: 16px; padding: 8px 16px; margin: 0; display: inline-block;"><i class="fas fa-exclamation-triangle"></i> Overdue ({{ task.progress }}%)</span>
                         {% else %}
-                            <i class="fas fa-caret-right" style="color: #ccc; margin-right: 10px;"></i>
+                            <span class="badge badge-blue" style="font-size: 16px; padding: 8px 16px; margin: 0; display: inline-block;"><i class="fas fa-spinner fa-spin"></i> In Progress ({{ task.progress }}%)</span>
                         {% endif %}
-                        {{ sub['title'] }}
+                    </div>
+
+                    <div style="margin-top: 25px;">
+                        <p style="margin: 0 0 8px 0; color: #64748b; font-size: 15px; font-weight: 600;">PRIORITY LEVEL</p>
+                        <span class="badge {% if task.priority == 'Urgent' or task.priority == 'High' %}badge-red{% elif task.priority == 'Medium' %}badge-blue{% else %}badge-green{% endif %}" style="font-size: 15px; padding: 6px 14px; margin: 0;">
+                            {{ task.priority or 'Medium' }}
+                        </span>
+                    </div>
+
+                    <div style="margin-top: 25px;">
+                        <p style="margin: 0 0 8px 0; color: #64748b; font-size: 15px; font-weight: 600;">DEADLINE</p>
+                        <p style="margin: 0; color: #1e293b; font-size: 18px; font-weight: 600;">
+                            <i class="far fa-calendar-alt" style="color: #4a90e2; margin-right: 5px;"></i> {{ task.deadline }}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Assignees Card -->
+                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 30px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px;">
+                        <h3 style="margin: 0; color: #334155; font-size: 22px;"><i class="fas fa-users" style="color: #4a90e2;"></i> Assignees</h3>
+                        <span class="badge badge-blue" style="margin: 0; font-size: 14px; padding: 4px 10px;">{{ assigned_devs|length }}</span>
                     </div>
                     
-                    <div style="display: flex; gap: 10px;">
-                        <!-- NEW: Done Button (Visible to Developers ONLY if not already completed) -->
-                        {% if not sub['is_completed'] and role == 'developer' %}
-                        <form method="POST" style="margin: 0;">
-                            <input type="hidden" name="complete_subtask_id" value="{{ sub['id'] }}">
-                            <button type="submit" style="background: #10b981; padding: 6px 12px; font-size: 11px; box-shadow: none;">
-                                <i class="fas fa-check"></i> Done
-                            </button>
-                        </form>
-                        {% endif %}
-
-                        <!-- Delete Subtask Button (Visible to Admins/Managers) -->
-                        {% if role == 'admin' or role == 'manager' %}
-                        <form method="POST" style="margin: 0;">
-                            <input type="hidden" name="delete_subtask_id" value="{{ sub['id'] }}">
-                            <button type="submit" style="background: #ef4444; padding: 6px 12px; font-size: 11px; box-shadow: none;">
-                                <i class="fas fa-trash"></i> Delete
-                            </button>
-                        </form>
-                        {% endif %}
+                    <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;">
+                        {% for dev in assigned_devs %}
+                        <div style="background: #ffffff; border: 1px solid #cbd5e1; padding: 15px; border-radius: 8px;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <img src="{{ url_for('static', filename='uploads/' + dev.profile_image) }}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;" onerror="this.src='{{ url_for('static', filename='uploads/default.png') }}';">
+                                    <span style="font-weight: 600; color: #1e293b; font-size: 15px;">{{ dev.full_name or dev.username }}</span>
+                                </div>
+                                <span style="font-weight: 700; color: #4a90e2; font-size: 15px;">{{ dev.progress }}%</span>
+                            </div>
+                            <div style="height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden;">
+                                <div style="height: 100%; width: {{ dev.progress }}%; background: {% if dev.progress == 100 %}#10b981{% else %}#4a90e2{% endif %}; border-radius: 3px;"></div>
+                            </div>
+                        </div>
+                        {% else %}
+                        <p style="color: #94a3b8; font-style: italic; margin: 0; font-size: 15px;">No developers assigned to this task yet.</p>
+                        {% endfor %}
                     </div>
-                </li>
-            {% else %}
-                <p style="color: #94a3b8; font-style: italic;">No subtasks yet.</p>
-            {% endfor %}
-        </ul>
+                </div>
 
-        <!-- Add subtask form visible to everyone to collaborate -->
-        <form method="POST" style="margin-top: 15px; display: flex; gap: 10px;">
-            <input type="text" name="subtask_title" required placeholder="Type new subtask..." style="margin: 0; flex-grow: 1;">
-            <button type="submit" style="white-space: nowrap;"><i class="fas fa-plus"></i> Add Subtask</button>
-        </form>
+            </div>
+        {% endif %}
 
-        <hr style="border: 0; height: 1px; background: #eee; margin: 40px 0 30px 0;">
-        
-        <!-- COMMENTS SECTION -->
-        <h3><i class="fas fa-comments" style="color: #4a90e2;"></i> Comments & Updates</h3>
-        
-        <form method="POST">
-            <textarea name="comment_content" rows="3" required placeholder="Type an update here..."></textarea>
-            <button type="submit"><i class="fas fa-paper-plane"></i> Post Comment</button>
-        </form>
+        <!-- Full-Width Section: Activity & Progress History -->
+        <div style="margin-top: 40px;">
+            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 35px; box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
+                <h3 style="margin-top: 0; margin-bottom: 25px; color: #334155; font-size: 22px;">
+                    <i class="fas fa-history" style="color: #4a90e2;"></i> Activity & Progress History
+                </h3>
 
-        <ul style="margin-top: 30px;">
-            {% for comment in comments %}
-                <li style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 3px solid #cbd5e1;">
-                    <small style="color: #94a3b8; font-weight: 600; display: block; margin-bottom: 5px;">
-                        <i class="fas fa-user"></i> {{ comment['author'] }} &bull; <i class="far fa-clock"></i> {{ comment['timestamp'] }}
-                    </small>
-                    {{ comment['content'] }}
-                </li>
-            {% else %}
-                <p style="color: #94a3b8; font-style: italic;">No comments yet. Be the first to provide an update!</p>
-            {% endfor %}
-        </ul>
+                <!-- Comment Input Form -->
+                <form method="POST" style="margin-bottom: 30px; display: flex; gap: 15px; align-items: flex-start;">
+                    <i class="fas fa-user-circle" style="color: #cbd5e1; font-size: 48px; margin-top: 5px;"></i>
+                    <div style="flex-grow: 1;">
+                        <textarea name="comment_content" rows="2" class="fb-comment-input" required placeholder="Write a comment..."></textarea>
+                        <div style="display: flex; justify-content: flex-end; margin-top: 15px;">
+                            <button type="submit" style="padding: 10px 24px; font-size: 18px; background: #1877f2; border-radius: 8px; box-shadow: none; font-family: system-ui, -apple-system, sans-serif;">
+                                <i class="fas fa-paper-plane"></i> Post
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Comments List -->
+                <div class="fb-comment-container">
+                    {% if comments|length > 2 %}
+                    <a href="javascript:void(0);" id="showMoreTaskBtn" onclick="toggleComments('extra-task-comment', 'showMoreTaskBtn')" class="fb-view-more">
+                        View more comments
+                    </a>
+                    {% endif %}
+
+                    {% for comment in comments %}
+                    <div class="fb-comment-wrapper {% if loop.index > 2 %}extra-task-comment{% endif %}" {% if loop.index > 2 %}style="display: none;"{% endif %}>
+                        <i class="fas fa-user-circle" style="color: #cbd5e1; font-size: 42px; margin-top: 4px;"></i>
+                        <div>
+                            <div class="fb-comment-bubble">
+                                <div class="fb-comment-author">{{ comment.author }}</div>
+                                <div class="fb-comment-text">{{ comment.content }}</div>
+                            </div>
+                            <div class="fb-comment-time">{{ comment.timestamp }}</div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <p style="color: #65676b; font-style: italic; font-size: 18px; margin: 0; font-family: system-ui, -apple-system, sans-serif;">No updates or comments recorded yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
     </div>
+
+    <!-- Script to toggle comments (View More / View Less) -->
+    <script>
+        function toggleComments(className, btnId) {
+            var extraElements = document.querySelectorAll('.' + className);
+            var btn = document.getElementById(btnId);
+            var isExpanded = btn.getAttribute('data-expanded') === 'true';
+
+            extraElements.forEach(function(el) {
+                el.style.display = isExpanded ? 'none' : 'flex';
+            });
+
+            if (isExpanded) {
+                btn.setAttribute('data-expanded', 'false');
+                btn.innerHTML = 'View more comments';
+            } else {
+                btn.setAttribute('data-expanded', 'true');
+                btn.innerHTML = 'View less comments';
+            }
+        }
+    </script>
 </body>
 </html>

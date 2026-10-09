@@ -1,14 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Add Project</title>
+    <title>Create Project</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <div class="container">
-        
-        <!-- Nav Bar -->
+    <div class="container" style="max-width: 600px;">
         <div class="nav-bar">
             <span><i class="fas fa-folder-plus"></i> Create New Project</span>
             <a href="/" style="color: #4a90e2; font-weight: 600; text-decoration: none;">
@@ -17,27 +15,21 @@
         </div>
 
         <form method="POST">
-            <h3 style="border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px;">Project Details</h3>
-            
             <label style="font-weight: 600; color: #475569;">Project Title:</label>
             <input type="text" name="project_title" required placeholder="E.g., Website Redesign">
+
+            <label style="font-weight: 600; color: #475569;">Assign a Manager:</label>
+            <select name="manager_id" required style="width: 100%; padding: 15px; margin: 8px 0 24px 0; border: 1px solid #e1e5eb; border-radius: 8px; font-size: 18px;">
+                {% for manager in managers %}
+                    <option value="{{ manager.id }}">{{ manager.full_name or manager.username }}</option>
+                {% endfor %}
+            </select>
 
             <label style="font-weight: 600; color: #475569;">Project Deadline:</label>
             <input type="date" name="project_deadline" required>
 
-            <h3 style="border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 30px; margin-bottom: 20px;">Assign First Task</h3>
-            
-            <label style="font-weight: 600; color: #475569;">Task Title:</label>
-            <input type="text" name="task_title" required placeholder="E.g., Create database schema">
-
-            <label style="font-weight: 600; color: #475569;">Assign to Developer (Enter ID):</label>
-            <input type="number" name="developer_id" required placeholder="Developer ID (e.g., 2)">
-
-            <label style="font-weight: 600; color: #475569;">Task Deadline:</label>
-            <input type="date" name="task_deadline" required>
-
-            <button type="submit" style="width: 100%; margin-top: 20px; font-size: 16px;">
-                <i class="fas fa-check-circle"></i> Create Project & Assign Task
+            <button type="submit" style="width: 100%; margin-top: 20px;">
+                <i class="fas fa-check-circle"></i> Create Project
             </button>
         </form>
     </div>
