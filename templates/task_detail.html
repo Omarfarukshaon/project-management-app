@@ -1,362 +1,1039 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Task Details</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
     <style>
-        input[type=range] {
-            -webkit-appearance: none;
-            width: 100%;
-            background: transparent;
-        }
-        input[type=range]::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            height: 32px;
-            width: 32px;
-            border-radius: 50%;
-            background: #4a90e2;
-            cursor: pointer;
-            margin-top: -11px;
-            box-shadow: 0 3px 10px rgba(74, 144, 226, 0.4);
-            border: 4px solid #ffffff;
-        }
-        input[type=range]::-webkit-slider-runnable-track {
-            width: 100%;
-            height: 12px;
-            cursor: pointer;
-            background: #e2e8f0;
-            border-radius: 6px;
-        }
-        textarea {
-            width: 100%;
-            padding: 16px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            font-family: inherit;
-            font-size: 16px;
-            color: #1e293b;
-            background-color: #ffffff;
-            box-sizing: border-box;
-            line-height: 1.5;
-            resize: vertical;
-        }
-        textarea:focus {
-            border-color: #4a90e2;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.15);
+        .task-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+            gap: 28px;
+            margin-top: 22px;
         }
 
-        /* Scaled-up Facebook Style Comments CSS */
-        .fb-comment-container {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
+        .panel {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 22px;
         }
-        .fb-comment-wrapper {
+
+        .panel h3 {
+            color: #334155;
+            font-size: 21px;
+            margin: 0 0 18px;
+        }
+
+        .muted {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .progress-track {
+            height: 10px;
+            background: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4a90e2, #3b82f6);
+        }
+
+        .criteria-row {
             display: flex;
-            gap: 15px;
             align-items: flex-start;
+            gap: 12px;
+            padding: 13px 12px;
+            border-bottom: 1px solid #eef2f7;
+            border-radius: 7px;
         }
-        .fb-comment-bubble {
-            background-color: #f0f2f5;
-            padding: 14px 22px;
-            border-radius: 20px;
-            display: inline-block;
-            max-width: 100%;
+
+        .criteria-row:last-child {
+            border-bottom: 0;
         }
-        .fb-comment-author {
-            font-weight: 600;
-            color: #050505;
-            font-size: 18px;
-            margin-bottom: 4px;
+
+        .criteria-row:hover {
+            background: #f8fafc;
         }
-        .fb-comment-text {
-            color: #050505;
-            font-size: 20px;
-            white-space: pre-line;
-            word-wrap: break-word;
-            line-height: 1.5;
-        }
-        .fb-comment-time {
-            color: #65676b;
-            font-size: 15px;
-            margin-left: 16px;
-            margin-top: 6px;
-        }
-        .fb-comment-input {
-            background-color: #f0f2f5;
-            border-radius: 25px;
-            border: none;
-            padding: 16px 24px;
-            font-family: system-ui, -apple-system, sans-serif;
-            font-size: 20px;
-            resize: none;
-        }
-        .fb-comment-input:focus {
-            box-shadow: none;
-            outline: none;
-            background-color: #e4e6e9;
-        }
-        .fb-view-more {
-            color: #1877f2;
-            font-weight: 600;
-            font-size: 18px;
-            text-decoration: none;
-            padding: 5px 0;
-            font-family: system-ui, -apple-system, sans-serif;
-            display: inline-block;
+
+        .criteria-row input[type=checkbox] {
+            width: 20px;
+            height: 20px;
+            margin: 2px 0 0;
+            flex: 0 0 auto;
+            accent-color: #2563eb;
             cursor: pointer;
         }
-        .fb-view-more:hover {
-            text-decoration: underline;
+
+        .criteria-label {
+            flex: 1;
+            color: #334155;
+            font-size: 15px;
+            line-height: 1.45;
+            cursor: pointer;
+        }
+
+        .criteria-row input:checked + .criteria-label {
+            color: #64748b;
+            text-decoration: line-through;
+        }
+
+        .weight {
+            flex: 0 0 auto;
+            font-size: 13px;
+            font-weight: 700;
+            color: #2563eb;
+            background: #eff6ff;
+            border-radius: 20px;
+            padding: 4px 9px;
+        }
+
+        .developer-checklist {
+            border: 1px solid #e2e8f0;
+            border-radius: 9px;
+            padding: 17px;
+            margin-top: 15px;
+        }
+
+        .developer-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .developer-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .developer-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 9px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 650;
+            font-size: 14px;
+            border: 1px solid #e2e8f0;
+            background: #fff;
+            color: #334155;
+            transition: 0.2s;
+        }
+
+        .developer-toggle:hover {
+            background: #f8fafc;
+            border-color: #94a3b8;
+        }
+
+        .developer-toggle.active {
+            background: #eff6ff;
+            border-color: #2563eb;
+            color: #1d4ed8;
+        }
+
+        .developer-toggle i {
+            font-size: 13px;
+        }
+
+        .assignee-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .assignee-row:last-of-type {
+            border-bottom: 0;
+        }
+
+        .assignee-name {
+            color: #334155;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .assignee-name:hover {
+            color: #2563eb;
+        }
+
+        .remove-btn {
+            background: #fee2e2;
+            color: #b91c1c;
+            padding: 8px 11px;
+            font-size: 13px;
+            box-shadow: none;
+        }
+
+        .remove-btn:hover {
+            background: #fecaca;
+        }
+
+        .add-form {
+            display: flex;
+            gap: 9px;
+            margin-top: 17px;
+            align-items: center;
+        }
+
+        .add-form select {
+            min-width: 0;
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 7px;
+            background: #fff;
+        }
+
+        .add-form button {
+            padding: 12px 15px;
+            font-size: 14px;
+        }
+
+        .deadline-warning {
+            margin: 15px 0 0;
+            padding: 11px 13px;
+            border-radius: 8px;
+            background: #fff1f2;
+            color: #be123c;
+            font-size: 14px;
+        }
+
+        .comment {
+            border-bottom: 1px solid #e2e8f0;
+            padding: 13px 0;
+        }
+
+        .comment:last-child {
+            border-bottom: 0;
+        }
+
+        textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 13px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font: inherit;
+            resize: vertical;
+        }
+
+        .submit-row {
+            text-align: right;
+            margin-top: 10px;
+        }
+
+        button:disabled,
+        select:disabled {
+            cursor: not-allowed;
+            opacity: 0.55;
+        }
+
+        @media(max-width: 850px) {
+            .task-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media(max-width: 600px) {
+            .container {
+                padding: 22px !important;
+            }
+
+            .add-form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .developer-toggle {
+                width: 100%;
+                box-sizing: border-box;
+            }
         }
     </style>
 </head>
+
 <body>
-    <div class="container" style="max-width: 1300px; width: 95%;">
-        
-        <div class="nav-bar" style="padding: 20px 30px; font-size: 20px;">
-            <span style="font-weight: 700;"><i class="fas fa-tasks" style="color: #4a90e2; margin-right: 8px;"></i> Task Details</span>
-            <a href="{{ url_for('project_detail', project_id=task.project_id) }}" style="color: #4a90e2; font-weight: 600; text-decoration: none; font-size: 18px;">
-                <i class="fas fa-arrow-left"></i> Back to Project
-            </a>
-        </div>
 
-        <div style="margin-bottom: 35px;">
-            <h1 style="margin: 0; color: #1e293b; font-size: 38px;">{{ task.title }}</h1>
-        </div>
+<div class="container" style="max-width:1250px;width:95%;">
 
-        <!-- ROLE-BASED LAYOUT ADJUSTMENT -->
-        {% if role == 'developer' %}
-            <!-- Developer View: Progress Slider on Left, Info & Assignees on Right -->
-            <div style="display: grid; grid-template-columns: 2.2fr 1fr; gap: 40px; margin-top: 20px;">
-                
-                <!-- Left Column: Progress Slider -->
-                <div>
-                    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 35px; box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
-                        <h3 style="margin-top: 0; margin-bottom: 15px; color: #334155; font-size: 22px;">
-                            <i class="fas fa-chart-pie" style="color: #4a90e2;"></i> Update My Task Progress & Work Log
-                        </h3>
-                        <p style="color: #64748b; font-size: 16px; margin-bottom: 30px; line-height: 1.5;">Drag the slider to set your individual percentage and log what work you have completed.</p>
+    <!-- NAVIGATION -->
 
-                        <form method="POST" style="display: flex; flex-direction: column;">
-                            
-                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-                                <span style="font-weight: 600; color: #94a3b8; font-size: 16px;">0% (Not Started)</span>
-                                <span style="font-weight: 800; color: #1e293b; font-size: 38px;" id="progressText">{{ my_progress }}%</span>
-                                <span style="font-weight: 600; color: #10b981; font-size: 16px;">100% (Completed)</span>
-                            </div>
-                            
-                            <input type="range" name="progress_value" min="0" max="100" value="{{ my_progress }}" 
-                                   oninput="document.getElementById('progressText').innerText = this.value + '%'">
-                            
-                            <div style="margin-top: 30px;">
-                                <label style="display: block; font-weight: 600; color: #334155; font-size: 18px; margin-bottom: 10px;">What work did you complete? <span style="color: #ef4444;">*</span></label>
-                                <textarea name="progress_note" rows="4" required placeholder="E.g., Finished writing schema and tested queries..."></textarea>
-                            </div>
+    <div class="nav-bar">
 
-                            <div style="display: flex; justify-content: flex-end; margin-top: 25px;">
-                                <button type="submit" name="update_progress" style="padding: 14px 28px; font-size: 18px; margin: 0; box-shadow: 0 4px 6px rgba(74, 144, 226, 0.2);">
-                                    <i class="fas fa-save"></i> Save My Progress & Log Work
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+        <span>
+            <i class="fas fa-tasks" style="color:#4a90e2;"></i>
+            Task Details
+        </span>
 
-                <!-- Right Column: Task Info & Assignees -->
-                <div>
-                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 30px; margin-bottom: 30px;">
-                        <h3 style="margin-top: 0; color: #334155; font-size: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px;">Task Info</h3>
-                        
-                        <div style="margin-top: 20px;">
-                            <p style="margin: 0 0 10px 0; color: #64748b; font-size: 15px; font-weight: 600;">OVERALL STATUS</p>
-                            {% if task.is_completed %}
-                                <span class="badge badge-green" style="font-size: 16px; padding: 8px 16px; margin: 0; display: inline-block;"><i class="fas fa-check-circle"></i> Completed (100%)</span>
-                            {% elif task.deadline < today %}
-                                <span class="badge badge-red" style="font-size: 16px; padding: 8px 16px; margin: 0; display: inline-block;"><i class="fas fa-exclamation-triangle"></i> Overdue ({{ task.progress }}%)</span>
-                            {% else %}
-                                <span class="badge badge-blue" style="font-size: 16px; padding: 8px 16px; margin: 0; display: inline-block;"><i class="fas fa-spinner fa-spin"></i> In Progress ({{ task.progress }}%)</span>
-                            {% endif %}
-                        </div>
+        <a href="{{ url_for('project_detail', project_id=task.project_id) }}"
+           style="color:#4a90e2;font-weight:600;text-decoration:none;">
 
-                        <div style="margin-top: 25px;">
-                            <p style="margin: 0 0 8px 0; color: #64748b; font-size: 15px; font-weight: 600;">PRIORITY LEVEL</p>
-                            <span class="badge {% if task.priority == 'Urgent' or task.priority == 'High' %}badge-red{% elif task.priority == 'Medium' %}badge-blue{% else %}badge-green{% endif %}" style="font-size: 15px; padding: 6px 14px; margin: 0;">
-                                {{ task.priority or 'Medium' }}
-                            </span>
-                        </div>
+            <i class="fas fa-arrow-left"></i>
+            Back to Project
 
-                        <div style="margin-top: 25px;">
-                            <p style="margin: 0 0 8px 0; color: #64748b; font-size: 15px; font-weight: 600;">DEADLINE</p>
-                            <p style="margin: 0; color: #1e293b; font-size: 18px; font-weight: 600;">
-                                <i class="far fa-calendar-alt" style="color: #4a90e2; margin-right: 5px;"></i> {{ task.deadline }}
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- Assignees with Individual Progress Tracking -->
-                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 30px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px;">
-                            <h3 style="margin: 0; color: #334155; font-size: 20px;"><i class="fas fa-users" style="color: #4a90e2;"></i> Assignees</h3>
-                            <span class="badge badge-blue" style="margin: 0; font-size: 14px; padding: 4px 10px;">{{ assigned_devs|length }}</span>
-                        </div>
-                        
-                        <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;">
-                            {% for dev in assigned_devs %}
-                            <div style="background: #ffffff; border: 1px solid #cbd5e1; padding: 15px; border-radius: 8px;">
-                                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-                                    <div style="display: flex; align-items: center; gap: 10px;">
-                                        <img src="{{ url_for('static', filename='uploads/' + dev.profile_image) }}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;" onerror="this.src='{{ url_for('static', filename='uploads/default.png') }}';">
-                                        <span style="font-weight: 600; color: #1e293b; font-size: 15px;">{{ dev.full_name or dev.username }}</span>
-                                    </div>
-                                    <span style="font-weight: 700; color: #4a90e2; font-size: 15px;">{{ dev.progress }}%</span>
-                                </div>
-                                <div style="height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden;">
-                                    <div style="height: 100%; width: {{ dev.progress }}%; background: {% if dev.progress == 100 %}#10b981{% else %}#4a90e2{% endif %}; border-radius: 3px;"></div>
-                                </div>
-                            </div>
-                            {% else %}
-                            <p style="color: #94a3b8; font-style: italic; margin: 0; font-size: 15px;">No developers assigned to this task yet.</p>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        {% else %}
-            <!-- Admin / Manager View: Balanced 2-Column Row for Task Info & Assignees -->
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 20px;">
-                
-                <!-- Task Info Card -->
-                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 30px;">
-                    <h3 style="margin-top: 0; color: #334155; font-size: 22px; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px;"><i class="fas fa-info-circle" style="color: #4a90e2;"></i> Task Info</h3>
-                    
-                    <div style="margin-top: 20px;">
-                        <p style="margin: 0 0 10px 0; color: #64748b; font-size: 15px; font-weight: 600;">OVERALL STATUS</p>
-                        {% if task.is_completed %}
-                            <span class="badge badge-green" style="font-size: 16px; padding: 8px 16px; margin: 0; display: inline-block;"><i class="fas fa-check-circle"></i> Completed (100%)</span>
-                        {% elif task.deadline < today %}
-                            <span class="badge badge-red" style="font-size: 16px; padding: 8px 16px; margin: 0; display: inline-block;"><i class="fas fa-exclamation-triangle"></i> Overdue ({{ task.progress }}%)</span>
-                        {% else %}
-                            <span class="badge badge-blue" style="font-size: 16px; padding: 8px 16px; margin: 0; display: inline-block;"><i class="fas fa-spinner fa-spin"></i> In Progress ({{ task.progress }}%)</span>
-                        {% endif %}
-                    </div>
-
-                    <div style="margin-top: 25px;">
-                        <p style="margin: 0 0 8px 0; color: #64748b; font-size: 15px; font-weight: 600;">PRIORITY LEVEL</p>
-                        <span class="badge {% if task.priority == 'Urgent' or task.priority == 'High' %}badge-red{% elif task.priority == 'Medium' %}badge-blue{% else %}badge-green{% endif %}" style="font-size: 15px; padding: 6px 14px; margin: 0;">
-                            {{ task.priority or 'Medium' }}
-                        </span>
-                    </div>
-
-                    <div style="margin-top: 25px;">
-                        <p style="margin: 0 0 8px 0; color: #64748b; font-size: 15px; font-weight: 600;">DEADLINE</p>
-                        <p style="margin: 0; color: #1e293b; font-size: 18px; font-weight: 600;">
-                            <i class="far fa-calendar-alt" style="color: #4a90e2; margin-right: 5px;"></i> {{ task.deadline }}
-                        </p>
-                    </div>
-                </div>
-
-                <!-- Assignees Card -->
-                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 30px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px;">
-                        <h3 style="margin: 0; color: #334155; font-size: 22px;"><i class="fas fa-users" style="color: #4a90e2;"></i> Assignees</h3>
-                        <span class="badge badge-blue" style="margin: 0; font-size: 14px; padding: 4px 10px;">{{ assigned_devs|length }}</span>
-                    </div>
-                    
-                    <div style="display: flex; flex-direction: column; gap: 15px; margin-top: 20px;">
-                        {% for dev in assigned_devs %}
-                        <div style="background: #ffffff; border: 1px solid #cbd5e1; padding: 15px; border-radius: 8px;">
-                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-                                <div style="display: flex; align-items: center; gap: 10px;">
-                                    <img src="{{ url_for('static', filename='uploads/' + dev.profile_image) }}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover;" onerror="this.src='{{ url_for('static', filename='uploads/default.png') }}';">
-                                    <span style="font-weight: 600; color: #1e293b; font-size: 15px;">{{ dev.full_name or dev.username }}</span>
-                                </div>
-                                <span style="font-weight: 700; color: #4a90e2; font-size: 15px;">{{ dev.progress }}%</span>
-                            </div>
-                            <div style="height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden;">
-                                <div style="height: 100%; width: {{ dev.progress }}%; background: {% if dev.progress == 100 %}#10b981{% else %}#4a90e2{% endif %}; border-radius: 3px;"></div>
-                            </div>
-                        </div>
-                        {% else %}
-                        <p style="color: #94a3b8; font-style: italic; margin: 0; font-size: 15px;">No developers assigned to this task yet.</p>
-                        {% endfor %}
-                    </div>
-                </div>
-
-            </div>
-        {% endif %}
-
-        <!-- Full-Width Section: Activity & Progress History -->
-        <div style="margin-top: 40px;">
-            <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 35px; box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
-                <h3 style="margin-top: 0; margin-bottom: 25px; color: #334155; font-size: 22px;">
-                    <i class="fas fa-history" style="color: #4a90e2;"></i> Activity & Progress History
-                </h3>
-
-                <!-- Comment Input Form -->
-                <form method="POST" style="margin-bottom: 30px; display: flex; gap: 15px; align-items: flex-start;">
-                    <i class="fas fa-user-circle" style="color: #cbd5e1; font-size: 48px; margin-top: 5px;"></i>
-                    <div style="flex-grow: 1;">
-                        <textarea name="comment_content" rows="2" class="fb-comment-input" required placeholder="Write a comment..."></textarea>
-                        <div style="display: flex; justify-content: flex-end; margin-top: 15px;">
-                            <button type="submit" style="padding: 10px 24px; font-size: 18px; background: #1877f2; border-radius: 8px; box-shadow: none; font-family: system-ui, -apple-system, sans-serif;">
-                                <i class="fas fa-paper-plane"></i> Post
-                            </button>
-                        </div>
-                    </div>
-                </form>
-
-                <!-- Comments List -->
-                <div class="fb-comment-container">
-                    {% if comments|length > 2 %}
-                    <a href="javascript:void(0);" id="showMoreTaskBtn" onclick="toggleComments('extra-task-comment', 'showMoreTaskBtn')" class="fb-view-more">
-                        View more comments
-                    </a>
-                    {% endif %}
-
-                    {% for comment in comments %}
-                    <div class="fb-comment-wrapper {% if loop.index > 2 %}extra-task-comment{% endif %}" {% if loop.index > 2 %}style="display: none;"{% endif %}>
-                        <i class="fas fa-user-circle" style="color: #cbd5e1; font-size: 42px; margin-top: 4px;"></i>
-                        <div>
-                            <div class="fb-comment-bubble">
-                                <div class="fb-comment-author">{{ comment.author }}</div>
-                                <div class="fb-comment-text">{{ comment.content }}</div>
-                            </div>
-                            <div class="fb-comment-time">{{ comment.timestamp }}</div>
-                        </div>
-                    </div>
-                    {% else %}
-                    <p style="color: #65676b; font-style: italic; font-size: 18px; margin: 0; font-family: system-ui, -apple-system, sans-serif;">No updates or comments recorded yet.</p>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
+        </a>
 
     </div>
 
-    <!-- Script to toggle comments (View More / View Less) -->
-    <script>
-        function toggleComments(className, btnId) {
-            var extraElements = document.querySelectorAll('.' + className);
-            var btn = document.getElementById(btnId);
-            var isExpanded = btn.getAttribute('data-expanded') === 'true';
 
-            extraElements.forEach(function(el) {
-                el.style.display = isExpanded ? 'none' : 'flex';
-            });
+    <!-- TASK TITLE -->
 
-            if (isExpanded) {
-                btn.setAttribute('data-expanded', 'false');
-                btn.innerHTML = 'View more comments';
-            } else {
-                btn.setAttribute('data-expanded', 'true');
-                btn.innerHTML = 'View less comments';
-            }
-        }
-    </script>
+    <h1 style="font-size:34px;color:#1e293b;margin:0 0 8px;">
+        {{ task.title }}
+    </h1>
+
+    <p class="muted" style="margin:0 0 24px;">
+        Deadline: {{ task.deadline }}
+        &nbsp; · &nbsp;
+        Priority: {{ task.priority or 'Medium' }}
+    </p>
+
+
+    <!-- ================================================== -->
+    <!-- DEVELOPER VIEW                                      -->
+    <!-- ================================================== -->
+
+    {% if role == 'developer' %}
+
+    <div class="task-layout">
+
+        <main>
+
+            <!-- MY CHECKLIST -->
+
+            <div class="panel">
+
+                <h3>
+                    <i class="fas fa-list-check" style="color:#4a90e2;"></i>
+                    Task Completion Checklist
+                </h3>
+
+                <p class="muted" style="margin-top:-8px;">
+                    Tick each criterion after completing it.
+                    Your percentage is calculated automatically
+                    using the weight of completed criteria.
+                </p>
+
+
+                {% if deadline_passed %}
+
+                <p class="deadline-warning">
+                    The deadline has passed.
+                    Checklist and progress updates are locked.
+                </p>
+
+                {% endif %}
+
+
+                <div style="display:flex;justify-content:space-between;align-items:center;margin:18px 0 9px;">
+
+                    <strong style="font-size:18px;color:#1e293b;">
+                        My Completion
+                    </strong>
+
+                    <strong style="font-size:24px;color:#2563eb;">
+                        {{ my_progress }}%
+                    </strong>
+
+                </div>
+
+
+                <div class="progress-track">
+
+                    <div class="progress-fill"
+                         style="width:{{ my_progress }}%;">
+
+                    </div>
+
+                </div>
+
+
+                {% if criterion_groups %}
+
+                    {% for group in criterion_groups %}
+
+                        {% for criterion in group.criteria %}
+
+                        <form method="POST" class="criteria-row">
+
+                            <input type="hidden"
+                                   name="toggle_criterion"
+                                   value="1">
+
+                            <input type="hidden"
+                                   name="criterion_id"
+                                   value="{{ criterion.id }}">
+
+                            <input type="hidden"
+                                   name="developer_id"
+                                   value="{{ group.developer.id }}">
+
+                            <input type="checkbox"
+                                   name="completed"
+                                   value="1"
+                                   onchange="this.form.submit()"
+                                   {% if criterion.is_completed %}checked{% endif %}
+                                   {% if deadline_passed %}disabled{% endif %}
+                                   aria-label="{{ criterion.title }}">
+
+                            <label class="criteria-label">
+                                {{ criterion.title }}
+                            </label>
+
+                            <span class="weight">
+                                {{ criterion.weight }}%
+                            </span>
+
+                        </form>
+
+                        {% endfor %}
+
+                    {% endfor %}
+
+                {% else %}
+
+                    <p class="muted">
+                        No checklist is available for this task.
+                    </p>
+
+                {% endif %}
+
+
+                <!-- WORK LOG -->
+
+                <div style="margin-top:22px;padding-top:18px;border-top:1px solid #e2e8f0;">
+
+                    <h3 style="font-size:17px;margin-bottom:10px;">
+
+                        <i class="fas fa-clipboard-list"
+                           style="color:#4a90e2;"></i>
+
+                        Work Log
+
+                    </h3>
+
+                    <form method="POST">
+
+                        <textarea name="progress_note"
+                                  rows="3"
+                                  placeholder="Describe the work you completed..."></textarea>
+
+                        <div class="submit-row">
+
+                            <button type="submit"
+                                    name="add_work_log"
+                                    value="1"
+                                    style="padding:10px 18px;font-size:14px;">
+
+                                <i class="fas fa-save"></i>
+                                Save Work Log
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </main>
+
+
+        <!-- DEVELOPER SIDEBAR -->
+
+        <aside>
+
+            <div class="panel" style="background:#f8fafc;">
+
+                <h3>Task Information</h3>
+
+
+                <p class="muted" style="font-weight:700;">
+                    OVERALL TASK STATUS
+                </p>
+
+                {% if task.is_completed %}
+
+                    <span class="badge badge-green" style="margin:0;">
+                        Completed (100%)
+                    </span>
+
+                {% elif deadline_passed %}
+
+                    <span class="badge badge-red" style="margin:0;">
+                        Overdue ({{ task.progress }}%)
+                    </span>
+
+                {% else %}
+
+                    <span class="badge badge-blue" style="margin:0;">
+                        In Progress ({{ task.progress }}%)
+                    </span>
+
+                {% endif %}
+
+
+                <p class="muted" style="font-weight:700;margin-top:22px;">
+                    MY PROGRESS
+                </p>
+
+                <div style="font-size:28px;font-weight:800;color:#1e293b;margin-bottom:8px;">
+                    {{ my_progress }}%
+                </div>
+
+                <div class="progress-track">
+
+                    <div class="progress-fill"
+                         style="width:{{ my_progress }}%;">
+
+                    </div>
+
+                </div>
+
+
+                <p class="muted" style="font-weight:700;margin-top:22px;">
+                    PRIORITY
+                </p>
+
+                <span class="badge {% if task.priority in ['Urgent', 'High'] %}badge-red{% elif task.priority == 'Medium' %}badge-blue{% else %}badge-green{% endif %}"
+                      style="margin:0;">
+
+                    {{ task.priority or 'Medium' }}
+
+                </span>
+
+
+                <p class="muted" style="font-weight:700;margin-top:22px;">
+                    DEADLINE
+                </p>
+
+                <strong>{{ task.deadline }}</strong>
+
+            </div>
+
+
+            <!-- TASK ASSIGNEES -->
+
+            <div class="panel" style="background:#f8fafc;">
+
+                <h3>
+                    <i class="fas fa-users" style="color:#4a90e2;"></i>
+                    Task Assignees
+                </h3>
+
+                {% for dev in assigned_devs %}
+
+                <div class="assignee-row">
+
+                    <span class="assignee-name">
+                        {{ dev.full_name or dev.username }}
+                    </span>
+
+                    <strong style="color:#2563eb;">
+                        {{ dev.progress }}%
+                    </strong>
+
+                </div>
+
+                {% else %}
+
+                <p class="muted">
+                    No developers assigned.
+                </p>
+
+                {% endfor %}
+
+            </div>
+
+        </aside>
+
+    </div>
+
+
+    <!-- ================================================== -->
+    <!-- ADMIN / MANAGER VIEW                                -->
+    <!-- ================================================== -->
+
+    {% else %}
+
+    <div class="task-layout">
+
+        <main>
+
+            <!-- OVERALL TASK PROGRESS -->
+
+            <div class="panel" style="background:#f8fafc;">
+
+                <h3>Task Overview</h3>
+
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px;">
+
+                    <span class="muted">
+                        Overall task completion
+                    </span>
+
+                    <strong style="font-size:25px;color:#2563eb;">
+                        {{ task.progress }}%
+                    </strong>
+
+                </div>
+
+                <div class="progress-track">
+
+                    <div class="progress-fill"
+                         style="width:{{ task.progress }}%;">
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+            <!-- DEVELOPER PROGRESS -->
+
+            <div class="panel">
+
+                <h3>
+                    <i class="fas fa-list-check" style="color:#4a90e2;"></i>
+                    Developer Progress
+                </h3>
+
+                <p class="muted" style="margin-top:-8px;">
+                    Click a developer's name to view their individual
+                    checklist.
+                </p>
+
+
+                {% if assigned_devs %}
+
+                    <!-- DEVELOPER NAME BUTTONS -->
+
+                    <div class="developer-buttons">
+
+                        {% for dev in assigned_devs %}
+
+                        <a href="{% if selected_developer_id == dev.id %}{{ url_for('task_detail', task_id=task.id) }}{% else %}{{ url_for('task_detail', task_id=task.id, developer_id=dev.id) }}{% endif %}"
+                           class="developer-toggle {% if selected_developer_id == dev.id %}active{% endif %}">
+
+                            <i class="fas {% if selected_developer_id == dev.id %}fa-chevron-down{% else %}fa-user{% endif %}"></i>
+
+                            {{ dev.full_name or dev.username }}
+
+                        </a>
+
+                        {% endfor %}
+
+                    </div>
+
+
+                    <!-- SELECTED DEVELOPER CHECKLIST -->
+
+                    {% if selected_developer_id %}
+
+                        {% for group in criterion_groups %}
+
+                        <div class="developer-checklist">
+
+                            <div class="developer-heading">
+
+                                <strong style="color:#1e293b;">
+                                    {{ group.developer.full_name or group.developer.username }}
+                                </strong>
+
+                                <strong style="color:#2563eb;">
+                                    {{ group.developer.progress }}%
+                                </strong>
+
+                            </div>
+
+
+                            <div class="progress-track"
+                                 style="margin-bottom:12px;">
+
+                                <div class="progress-fill"
+                                     style="width:{{ group.developer.progress }}%;">
+
+                                </div>
+
+                            </div>
+
+
+                            {% for criterion in group.criteria %}
+
+                            <form method="POST" class="criteria-row">
+
+                                <input type="hidden"
+                                       name="toggle_criterion"
+                                       value="1">
+
+                                <input type="hidden"
+                                       name="criterion_id"
+                                       value="{{ criterion.id }}">
+
+                                <input type="hidden"
+                                       name="developer_id"
+                                       value="{{ group.developer.id }}">
+
+                                <input type="checkbox"
+                                       name="completed"
+                                       value="1"
+                                       onchange="this.form.submit()"
+                                       {% if criterion.is_completed %}checked{% endif %}
+                                       {% if deadline_passed %}disabled{% endif %}
+                                       aria-label="{{ criterion.title }}">
+
+                                <label class="criteria-label">
+                                    {{ criterion.title }}
+                                </label>
+
+                                <span class="weight">
+                                    {{ criterion.weight }}%
+                                </span>
+
+                            </form>
+
+                            {% endfor %}
+
+                        </div>
+
+                        {% else %}
+
+                        <p class="muted" style="margin-top:18px;">
+                            No checklist is available for this developer.
+                        </p>
+
+                        {% endfor %}
+
+                    {% endif %}
+
+
+                {% else %}
+
+                    <p class="muted" style="margin-top:18px;">
+                        No developers are assigned to this task yet.
+                        Add developers using the Assignees panel.
+                    </p>
+
+                {% endif %}
+
+
+                {% if deadline_passed %}
+
+                <p class="deadline-warning">
+                    The deadline has passed.
+                    Checklist and assignment updates are locked.
+                </p>
+
+                {% endif %}
+
+            </div>
+
+        </main>
+
+
+        <!-- ADMIN / MANAGER SIDEBAR -->
+
+        <aside>
+
+            <!-- TASK INFORMATION -->
+
+            <div class="panel" style="background:#f8fafc;">
+
+                <h3>Task Information</h3>
+
+
+                <p class="muted" style="font-weight:700;">
+                    STATUS
+                </p>
+
+                {% if task.is_completed %}
+
+                    <span class="badge badge-green" style="margin:0;">
+                        Completed
+                    </span>
+
+                {% elif deadline_passed %}
+
+                    <span class="badge badge-red" style="margin:0;">
+                        Overdue
+                    </span>
+
+                {% else %}
+
+                    <span class="badge badge-blue" style="margin:0;">
+                        In Progress
+                    </span>
+
+                {% endif %}
+
+
+                <p class="muted" style="font-weight:700;margin-top:22px;">
+                    PRIORITY
+                </p>
+
+                <span class="badge {% if task.priority in ['Urgent', 'High'] %}badge-red{% elif task.priority == 'Medium' %}badge-blue{% else %}badge-green{% endif %}"
+                      style="margin:0;">
+
+                    {{ task.priority or 'Medium' }}
+
+                </span>
+
+
+                <p class="muted" style="font-weight:700;margin-top:22px;">
+                    DEADLINE
+                </p>
+
+                <strong>{{ task.deadline }}</strong>
+
+            </div>
+
+
+            <!-- ASSIGNEES AND TASK-LEVEL DEVELOPER MANAGEMENT -->
+
+            <div class="panel">
+
+                <h3>
+                    <i class="fas fa-users" style="color:#4a90e2;"></i>
+                    Assignees
+
+                    <span class="badge badge-blue"
+                          style="margin-left:5px;">
+
+                        {{ assigned_devs|length }}
+
+                    </span>
+
+                </h3>
+
+
+                <!-- CURRENT DEVELOPERS -->
+
+                {% for dev in assigned_devs %}
+
+                <div class="assignee-row">
+
+                    <a href="{% if selected_developer_id == dev.id %}{{ url_for('task_detail', task_id=task.id) }}{% else %}{{ url_for('task_detail', task_id=task.id, developer_id=dev.id) }}{% endif %}"
+                       class="assignee-name">
+
+                        {{ dev.full_name or dev.username }}
+
+                    </a>
+
+
+                    <!-- REMOVE DEVELOPER -->
+
+                    <form method="POST"
+                          style="margin:0;"
+                          onsubmit="return confirm('Remove this developer from the task?');">
+
+                        <input type="hidden"
+                               name="remove_assignee_id"
+                               value="{{ dev.id }}">
+
+                        {% if selected_developer_id %}
+                        <input type="hidden"
+                               name="developer_id"
+                               value="{{ selected_developer_id }}">
+                        {% endif %}
+
+                        <button type="submit"
+                                class="remove-btn"
+                                title="Remove developer"
+                                {% if deadline_passed %}disabled{% endif %}>
+
+                            <i class="fas fa-user-minus"></i>
+
+                        </button>
+
+                    </form>
+
+                </div>
+
+                {% else %}
+
+                <p class="muted">
+                    No developers assigned to this task yet.
+                </p>
+
+                {% endfor %}
+
+
+                <!-- ADD DEVELOPER -->
+
+                {% if available_devs %}
+
+                <form method="POST" class="add-form">
+
+                    <select name="add_assignee_id"
+                            required
+                            {% if deadline_passed %}disabled{% endif %}>
+
+                        <option value="" disabled selected>
+                            Add a developer...
+                        </option>
+
+                        {% for dev in available_devs %}
+
+                        <option value="{{ dev.id }}">
+
+                            {{ dev.full_name or dev.username }}
+                            ({{ dev.username }})
+
+                        </option>
+
+                        {% endfor %}
+
+                    </select>
+
+
+                    {% if selected_developer_id %}
+
+                    <input type="hidden"
+                           name="developer_id"
+                           value="{{ selected_developer_id }}">
+
+                    {% endif %}
+
+
+                    <button type="submit"
+                            {% if deadline_passed %}disabled{% endif %}>
+
+                        <i class="fas fa-user-plus"></i>
+                        Add
+
+                    </button>
+
+                </form>
+
+                {% else %}
+
+                <p class="muted" style="margin-top:15px;">
+                    All available developers are already assigned
+                    to this task.
+                </p>
+
+                {% endif %}
+
+
+                {% if deadline_passed %}
+
+                <p class="deadline-warning">
+                    Developer assignments are locked because
+                    the task deadline has passed.
+                </p>
+
+                {% endif %}
+
+            </div>
+
+        </aside>
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- ================================================== -->
+    <!-- ACTIVITY AND COMMENTS                               -->
+    <!-- ================================================== -->
+
+    <div class="panel" style="margin-top:28px;">
+
+        <h3>
+            <i class="fas fa-history" style="color:#4a90e2;"></i>
+            Activity & Progress History
+        </h3>
+
+
+        <!-- ADD COMMENT -->
+
+        <form method="POST"
+              style="display:flex;gap:12px;align-items:flex-start;margin-bottom:22px;">
+
+            <i class="fas fa-user-circle"
+               style="font-size:38px;color:#cbd5e1;">
+
+            </i>
+
+            <div style="flex:1;">
+
+                <textarea name="comment_content"
+                          rows="2"
+                          required
+                          placeholder="Write a comment or update..."></textarea>
+
+                <div class="submit-row">
+
+                    <button type="submit"
+                            style="padding:10px 18px;font-size:14px;">
+
+                        <i class="fas fa-paper-plane"></i>
+                        Post
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </form>
+
+
+        <!-- EXISTING COMMENTS -->
+
+        {% for comment in comments %}
+
+        <div class="comment">
+
+            <strong style="color:#1e293b;">
+                {{ comment.author }}
+            </strong>
+
+            <p style="white-space:pre-line;color:#334155;margin:5px 0;">
+                {{ comment.content }}
+            </p>
+
+            <span class="muted">
+                {{ comment.timestamp }}
+            </span>
+
+        </div>
+
+        {% else %}
+
+        <p class="muted">
+            No updates or comments recorded yet.
+        </p>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
 </body>
 </html>
